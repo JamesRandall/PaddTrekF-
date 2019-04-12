@@ -17,3 +17,13 @@ type Game = {
     //player: Player
 }
 
+type Quadrant = {
+    map: GameWorldObject array array
+    objects: GameWorldObject array
+}
+
+let getAttributes gameWorldObject =
+    match gameWorldObject with
+        | EnemyShip es -> es.attributes
+        | Star st -> st.attributes
+        | Player pl -> pl.attributes

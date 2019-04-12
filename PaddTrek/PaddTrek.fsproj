@@ -14,7 +14,9 @@
 
     <ItemGroup>
       <Compile Include="Game\CoordinateHelpers.fs" />
+      <Compile Include="Game\GameObjects.fs" />
       <Compile Include="Game\GameBuilder.fs" />
+      <Compile Include="Game\Quadrant.fs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -23,6 +25,10 @@
 
     <ItemGroup>
       <None Include="GameBuilderScratch.fsx" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Rendering\Console" />
     </ItemGroup>
 
 </Project>

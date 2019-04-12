@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Include="Domain\Primitives.fs" />
+      <Compile Include="Domain\Player.fs" />
+      <Compile Include="Domain\Enemy.fs" />
+      <Compile Include="Domain\GameObjects.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include="Game\CoordinateHelpers.fs" />
+      <Compile Include="Game\GameBuilder.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="GameBuilderScratch.fsx" />
+    </ItemGroup>
+
+</Project>

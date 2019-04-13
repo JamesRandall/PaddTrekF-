@@ -11,11 +11,13 @@ let objectsInQuadrant gameObjects quadrantCoordinate =
 
 let createQuadrant gameObjects quadrantCoordinate gameSize =
     let quadrantObjects = objectsInQuadrant gameObjects quadrantCoordinate
-    let quadrantArray = [| for y in 0 .. gameSize.sectorSize.height -> [|
-                            for x in 0 .. gameSize.sectorSize.width -> findWithSectorCoordinate quadrantObjects { x = x; y = y }
-        |]
-    |]
-    
+
+    let quadrantArray = Seq.toArray (
+                            Seq.map (fun y -> Seq.toArray (
+                                                Seq.map (fun x -> findWithSectorCoordinate quadrantObjects { x = x; y = y })
+                                                    [0..gameSize.sectorSize.width-1]))
+                                [0 .. gameSize.sectorSize.height-1])
+
     {
         map = quadrantArray
         objects = quadrantObjects

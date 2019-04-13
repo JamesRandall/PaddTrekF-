@@ -49,7 +49,7 @@ let createGame =
     let createEnemyScout () = createEnemy EnemyType.Scout
                                   "Scout" "An enemy scout with weak shields and a weak hull" 1000 1000 1000
     
-    let stars = Seq.map (fun _ -> createStar()) [0..1000]
+    let stars = Seq.map (fun _ -> createStar()) [0..300]
     let enemyScouts = Seq.map (fun _ -> createEnemyScout()) [0..150]
         
     {

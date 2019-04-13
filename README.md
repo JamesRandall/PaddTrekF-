@@ -1,5 +1,7 @@
 # Padd Trek
 
+**_This is a learning project for me and I'd deeply appreciate the input of F# experts - please leave any comments in Issues so that I can develop good habits early and learn fast! Thank you!_**
+
 I've written a few versions of the classic main frame Star Trek game over the years, mostly to teach myself new languages, operating systems, environments etc.
 
 The last one was called Padd Trek (because it ran on the iPad, written in Objective-C, and well PADD!) - I pulled it from the store and stopped maintaining it as app development on iOS got ever more complex (devices, rule changes etc.).

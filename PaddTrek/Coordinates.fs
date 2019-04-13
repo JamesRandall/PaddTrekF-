@@ -1,6 +1,7 @@
 module PaddTrek.Coordinates
 open System
 open PaddTrek.GameTypes
+open System.Collections.Generic
 
 let randomGalacticPosition gameSize =
     let randomNumberGenerator = Random()
@@ -14,12 +15,11 @@ let randomGalacticPosition gameSize =
             y = randomNumberGenerator.Next(0, gameSize.sectorSize.height - 1)
         }
     }
-    
 
-let nonClashingRandomGalacticPosition existingCoordinates gameSize =
-    let getNewPosition =
+let nonClashingRandomGalacticPosition (existingCoordinates:ISet<GalacticCoordinate>, gameSize:GameSize) =
+    let getNewPosition () =
         let candidatePosition = randomGalacticPosition gameSize
-        if Seq.exists (fun existingPosition -> existingPosition = candidatePosition) existingCoordinates then
+        if existingCoordinates.Contains(candidatePosition) then
             nullGalacticCoordinate
         else
             candidatePosition
@@ -27,6 +27,6 @@ let nonClashingRandomGalacticPosition existingCoordinates gameSize =
     let mutable newPosition = nullGalacticCoordinate
     
     while newPosition = nullGalacticCoordinate do
-        newPosition <- getNewPosition
-        
+        newPosition <- getNewPosition ()
+    
     newPosition

@@ -17,5 +17,3 @@ let findWithSectorCoordinate gameObjects sectorCoordinate =
         EmptySpace emptySpace
     else
         result.Value
-        
-    

@@ -7,8 +7,7 @@ let objectsInQuadrant gameObjects quadrantCoordinate =
         let attributes = getAttributes gameObject
         attributes.position.quadrant = quadrantCoordinate
         
-    let result = Seq.toArray (Seq.filter isInQuadrant gameObjects)
-    result
+    Seq.toArray (Seq.filter isInQuadrant gameObjects)
 
 let createQuadrant gameObjects quadrantCoordinate gameSize =
     let quadrantObjects = objectsInQuadrant gameObjects quadrantCoordinate

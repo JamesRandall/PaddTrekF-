@@ -1,16 +1,18 @@
 module PaddTrek.Game.GameBuilder
 open PaddTrek.GameTypes
 open PaddTrek.Coordinates
+open System.Collections.Generic
 
 
 let createGame =
     let gameSize = { quadrantSize = { width = 8; height = 8 } ; sectorSize = { width = 8; height = 8 } }
-    let existingObjects = []
-    
+    let existingCoordinates = HashSet<GalacticCoordinate>()
     let newPosition () =
-        nonClashingRandomGalacticPosition existingObjects gameSize
+        let createdPosition = nonClashingRandomGalacticPosition (existingCoordinates, gameSize)
+        ignore(existingCoordinates.Add (createdPosition))
+        createdPosition
     
-    let createStar =
+    let createStar () =
         Star({
              attributes = {
                 name = "Star"
@@ -20,7 +22,6 @@ let createGame =
         })
         
     let createEnemy enemyType name description maxEnergy maxShields maxHull =
-        let position = newPosition
         EnemyShip({
             attributes = {
                 name = name
@@ -48,7 +49,7 @@ let createGame =
     let createEnemyScout () = createEnemy EnemyType.Scout
                                   "Scout" "An enemy scout with weak shields and a weak hull" 1000 1000 1000
     
-    let stars = Seq.map (fun _ -> createStar) [0..1000]
+    let stars = Seq.map (fun _ -> createStar()) [0..1000]
     let enemyScouts = Seq.map (fun _ -> createEnemyScout()) [0..150]
         
     {

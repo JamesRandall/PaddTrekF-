@@ -6,29 +6,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Include="Domain\Primitives.fs" />
-      <Compile Include="Domain\Player.fs" />
-      <Compile Include="Domain\Enemy.fs" />
-      <Compile Include="Domain\GameObjects.fs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Include="Game\CoordinateHelpers.fs" />
-      <Compile Include="Game\GameObjects.fs" />
-      <Compile Include="Game\GameBuilder.fs" />
-      <Compile Include="Game\Quadrant.fs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Include="Program.fs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="GameBuilderScratch.fsx" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="Rendering\Console" />
+      <Compile Include="GameTypes.fs" />
+      <Compile Include="Coordinates.fs" />
+      <Compile Include="GameObjects.fs" />
+      <Compile Include="Quadrant.fs" />
+      <Compile Include="GameBuilder.fs" />
+      <Compile Include="Rendering.fs" />
+      <Compile Include="Program.fs" />
+      <None Include="GameBuilderScratch.fsx" />
     </ItemGroup>
 
 </Project>

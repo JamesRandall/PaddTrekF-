@@ -1,8 +1,6 @@
 module PaddTrek.Game.GameBuilder
-open PaddTrek.Domain.Enemy
-open PaddTrek.Domain.Primitives
-open PaddTrek.Domain.GameObjects
-open PaddTrek.Game.CoordinateHelpers
+open PaddTrek.GameTypes
+open PaddTrek.Coordinates
 
 
 let createGame =
@@ -21,7 +19,7 @@ let createGame =
             }
         })
         
-    let createEnemy name description maxEnergy maxShields maxHull =
+    let createEnemy enemyType name description maxEnergy maxShields maxHull =
         let position = newPosition
         EnemyShip({
             attributes = {
@@ -29,6 +27,7 @@ let createGame =
                 description = description
                 position = newPosition() 
             }
+            enemyType = enemyType
             energy = {
                 min = 0
                 max = maxEnergy
@@ -46,13 +45,15 @@ let createGame =
             }
         })
     
-    let createEnemyScout () = createEnemy "Scout" "An enemy scout with weak shields and a weak hull" 1000 1000 1000
+    let createEnemyScout () = createEnemy EnemyType.Scout
+                                  "Scout" "An enemy scout with weak shields and a weak hull" 1000 1000 1000
     
     let stars = Seq.toList (Seq.map (fun _ -> createStar) [0..400])
     let enemyScouts = Seq.toList (Seq.map (fun _ -> createEnemyScout()) [0..150])
         
     {
         objects = List.concat (seq [stars; enemyScouts])
+        size = gameSize
     }
 
     

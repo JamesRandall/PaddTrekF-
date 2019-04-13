@@ -1,7 +1,7 @@
 module PaddTrek.Game.Quadrant
-open PaddTrek.Domain.GameObjects
-open PaddTrek.Domain.Primitives
-open PaddTrek.Game.GameObjects
+open PaddTrek
+open PaddTrek.GameTypes
+open PaddTrek.GameObjects
 
 let objectsInQuadrant gameObjects quadrantCoordinate =
     let isInQuadrant gameObject =

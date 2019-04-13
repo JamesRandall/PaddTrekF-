@@ -1,6 +1,6 @@
-module PaddTrek.Game.CoordinateHelpers
+module PaddTrek.Coordinates
 open System
-open PaddTrek.Domain.Primitives
+open PaddTrek.GameTypes
 
 let randomGalacticPosition gameSize =
     let randomNumberGenerator = Random()

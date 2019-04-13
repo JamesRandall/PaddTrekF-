@@ -5,10 +5,10 @@ open PaddTrek.Game.GameBuilder
 [<EntryPoint>]
 let main argv =
     let game = createGame
-    let createQuadrantFromGame =
-        Quadrant.createQuadrant game.objects { x=0; y=0 } game.size
+    let createQuadrantFromGame () =
+        Quadrant.createQuadrant game.objects { x=1; y=1 } game.size
         
-    let quadrant = createQuadrantFromGame
+    let quadrant = createQuadrantFromGame ()
     Rendering.renderShortRangeScanner quadrant
     
     0 // return an integer exit code

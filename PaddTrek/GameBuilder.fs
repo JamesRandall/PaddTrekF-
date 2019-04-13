@@ -48,12 +48,11 @@ let createGame =
     let createEnemyScout () = createEnemy EnemyType.Scout
                                   "Scout" "An enemy scout with weak shields and a weak hull" 1000 1000 1000
     
-    let stars = Seq.toList (Seq.map (fun _ -> createStar) [0..400])
-    let enemyScouts = Seq.toList (Seq.map (fun _ -> createEnemyScout()) [0..150])
+    let stars = Seq.map (fun _ -> createStar) [0..1000]
+    let enemyScouts = Seq.map (fun _ -> createEnemyScout()) [0..150]
         
     {
-        objects = List.concat (seq [stars; enemyScouts])
+        objects = Seq.toList (Seq.append stars enemyScouts)
         size = gameSize
     }
-
     

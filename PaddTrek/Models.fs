@@ -1,18 +1,14 @@
-module PaddTrek.GameTypes
+module PaddTrek.Models
 
 type Coordinate = {
     x: int
     y: int
 }
 
-let nullCoordinate = { x = -1; y = -1 }
-
 type GalacticCoordinate = {
     quadrant: Coordinate
     sector: Coordinate
 }
-
-let nullGalacticCoordinate = { quadrant = nullCoordinate; sector = nullCoordinate }
     
 type Range = {
     min: int
@@ -58,12 +54,16 @@ type Player = {
     health: PlayerHealth
 }
 
+type Starbase = {
+    attributes: GameWorldObjectAttributes
+}
+
 // Enemies
 
 type EnemyType =
-    | Scout = 0
-    | Cruiser = 1
-    | Dreadnought = 2
+    | Scout
+    | Cruiser
+    | Dreadnought
 
 type EnemyShip = {
     attributes: GameWorldObjectAttributes
@@ -83,20 +83,13 @@ type EmptySpace = {
     attributes: GameWorldObjectAttributes
 }
 
-let emptySpace : EmptySpace = {
-    attributes = {
-        name = ""
-        description = ""
-        position = nullGalacticCoordinate
-    }
-}
-
 // Game world
 
 type GameWorldObject =
     | EnemyShip of EnemyShip
     | Star of Star
     | Player of Player
+    | Starbase of Starbase
     | EmptySpace of EmptySpace
 
 type GameSize = {
@@ -105,13 +98,19 @@ type GameSize = {
 }
 
 type Game = {
-    objects: GameWorldObject list
     size: GameSize
-    //player: Player
+    objects: GameWorldObject list
+    player: Player
 }
 
 type Quadrant = {
     map: GameWorldObject array array
     objects: GameWorldObject array
+}
+
+type QuadrantSummary = {
+    numberOfEnemies: int
+    numberOfStars: int
+    starbase: bool
 }
 

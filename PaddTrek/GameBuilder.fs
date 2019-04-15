@@ -1,5 +1,5 @@
 module PaddTrek.Game.GameBuilder
-open PaddTrek.GameTypes
+open PaddTrek.Models
 open PaddTrek.Coordinates
 open System.Collections.Generic
 
@@ -48,12 +48,35 @@ let createGame =
     
     let createEnemyScout () = createEnemy EnemyType.Scout
                                   "Scout" "An enemy scout with weak shields and a weak hull" 1000 1000 1000
+
+    let createPlayer () = 
+        {
+            attributes = {
+                name = "Player"
+                description = "The player"
+                position = newPosition() 
+            }
+            energy = { min = 0 ; max = 1000 ; value = 1000 }
+            shields = {
+                fore = { min = 0 ; max = 1000 ; value = 1000 }
+                port = { min = 0 ; max = 1000 ; value = 1000 }
+                aft = { min = 0 ; max = 1000 ; value = 1000 }
+                starboard = { min = 0 ; max = 1000 ; value = 1000 }
+            }
+            health = {
+                hull = { name = "Hull" ; health = { min = 0 ; max = 1000 ; value = 1000 } }
+                impulseEngines = { name = "Impulse Engines" ; health = { min = 0 ; max = 1000 ; value = 1000 } }
+                warpEngines = { name = "Warp Engines" ; health = { min = 0 ; max = 1000 ; value = 1000 } }
+            }
+        }
     
     let stars = Seq.map (fun _ -> createStar()) [0..300]
     let enemyScouts = Seq.map (fun _ -> createEnemyScout()) [0..150]
+    let player = createPlayer ()
         
     {
-        objects = Seq.toList (Seq.append stars enemyScouts)
         size = gameSize
+        objects = Seq.toList (Seq.append stars enemyScouts |> Seq.append [Player(player)] )
+        player = player
     }
     

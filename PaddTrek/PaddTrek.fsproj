@@ -6,13 +6,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Rendering\Console" />
-      <Compile Include="GameTypes.fs" />
+      <Compile Include="Models.fs" />
       <Compile Include="Coordinates.fs" />
       <Compile Include="GameObjects.fs" />
       <Compile Include="Quadrant.fs" />
       <Compile Include="GameBuilder.fs" />
       <Compile Include="Rendering.fs" />
+      <Compile Include="Ai.fs" />
       <Compile Include="Program.fs" />
       <None Include="GameBuilderScratch.fsx" />
     </ItemGroup>

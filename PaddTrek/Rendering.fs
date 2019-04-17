@@ -1,6 +1,9 @@
 module PaddTrek.Rendering
 open System
 open PaddTrek.Models
+open PaddTrek.Enemies
+open PaddTrek.Map
+open PaddTrek.Game
 
 let private defaultConsoleColor = ConsoleColor.Green
 
@@ -23,7 +26,7 @@ let renderShortRangeScanner quadrant =
         
     let getGameObjectCharacter gameWorldObject =
         match gameWorldObject with
-            | EnemyShip enemy -> enemyShipCharacter enemy
+            | GameWorldObject.EnemyShip enemy -> enemyShipCharacter enemy
             | Star _ -> "*"
             | Player _ -> "p"
             | EmptySpace _ -> "."

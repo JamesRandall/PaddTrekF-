@@ -6,9 +6,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Include="Random.fs" />
+      <Compile Include="Range.fs" />
+      <Compile Include="Geography.fs" />
       <Compile Include="Models.fs" />
-      <Compile Include="Coordinates.fs" />
-      <Compile Include="GameObjects.fs" />
+      <Compile Include="Space.fs" />
+      <Compile Include="Player.fs" />
+      <Compile Include="Starbase.fs" />
+      <Compile Include="Enemies.fs" />
+      <Compile Include="Game.fs" />
       <Compile Include="Quadrant.fs" />
       <Compile Include="GameBuilder.fs" />
       <Compile Include="Rendering.fs" />

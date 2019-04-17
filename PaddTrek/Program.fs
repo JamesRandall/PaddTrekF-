@@ -1,6 +1,6 @@
-﻿open PaddTrek.Game
-open PaddTrek
-open PaddTrek.Game.GameBuilder
+﻿open PaddTrek
+open PaddTrek.Game
+open PaddTrek.GameBuilder
 open System
 open PaddTrek.Ai
 
@@ -13,7 +13,7 @@ let main argv =
         Console.ReadKey().Key = ConsoleKey.Y
 
     let createQuadrantFromGame () =
-        Quadrant.createQuadrant game.objects game.player.attributes.position.quadrant game.size
+        Map.createQuadrant game.objects game.player.attributes.position.quadrant game.size
 
     let acceptInput () =
         let readInput () =

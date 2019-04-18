@@ -15,7 +15,7 @@
       <Compile Include="Starbase.fs" />
       <Compile Include="Enemies.fs" />
       <Compile Include="Game.fs" />
-      <Compile Include="Quadrant.fs" />
+      <Compile Include="Map.fs" />
       <Compile Include="GameBuilder.fs" />
       <Compile Include="Rendering.fs" />
       <Compile Include="Ai.fs" />

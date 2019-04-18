@@ -11,7 +11,8 @@ type Quadrant = {
 type QuadrantSummary = {
     numberOfEnemies: int
     numberOfStars: int
-    starbase: bool
+    hasStarbase: bool
+    hasPlayer: bool
 }
 
 let findWithSectorCoordinate gameObjects sectorCoordinate =
@@ -57,8 +58,9 @@ let createQuadrantSummaries gameObjects worldSize =
             numberOfEnemies = Seq.fold (fun sum -> function | EnemyShip _ -> sum + 1 | _ -> sum) 0 objectsForSummary
             numberOfStars = Seq.sumBy (fun gameObject -> match gameObject with | Star _ -> 1 | _ -> 0) objectsForSummary
             // are these equivelant - need to test in repl
-            starbase = Seq.exists (function | Starbase _ -> true | _ -> false) objectsForSummary
+            hasStarbase = Seq.exists (function | Starbase _ -> true | _ -> false) objectsForSummary
             //starbase = Seq.exists (fun gameObject -> match gameObject with | Starbase _ -> true | _ -> false) objectsForSummary
+            hasPlayer = Seq.exists (function | Player _ -> true | _ -> false) objectsForSummary
         }
 
     let createSummaryRow y =

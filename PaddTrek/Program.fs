@@ -22,7 +22,7 @@ let main argv =
             if inputLine.Length = 0 then
                 "", Array.empty<string>
             else
-                let command = inputLine.Substring (0,1)
+                let command = (inputLine.Substring (0,1)).ToUpper()
                 let args = inputLine.Substring(1).Split(' ')
                 command, args
         let command, args = readInput ()
@@ -39,6 +39,9 @@ let main argv =
 
     let renderShortRangeScanner () =
         Rendering.renderShortRangeScanner (createQuadrantFromGame ())
+
+    let renderLongRangeScanner () =
+        Rendering.renderLongRangeScanner game.objects game.size
     
     let gameLoop () =
         let handleAiActionIfRequired actionRequired =
@@ -55,6 +58,7 @@ let main argv =
             let gameOver = (match command with
                                 | "Q" -> noAiActionRequired (fun _ -> quit <- confirmQuit())
                                 | "S" -> noAiActionRequired (fun _ -> renderShortRangeScanner ())
+                                | "L" -> noAiActionRequired (fun _ -> renderLongRangeScanner ())
                                 | "?" -> noAiActionRequired (fun _ -> Rendering.renderHelp ())
                                 | _ -> noAiActionRequired (fun _ -> Rendering.renderMessage "Sorry I did not understand that command"))
                         |> handleAiActionIfRequired

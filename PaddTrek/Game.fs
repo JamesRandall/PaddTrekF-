@@ -6,11 +6,13 @@ type GameWorldObject =
     | Player of Player.Player
     | Starbase of Starbase.Starbase
     | EmptySpace of Space.EmptySpace
+    with
+        member x.PlayerValue =
+            match x with | Player p -> p | _ -> failwith "Not a player"
 
 type Game = {
     size: Geography.WorldSize
     objects: GameWorldObject list
-    player: Player.Player
     score: int
     gameOver: bool
 }
@@ -22,4 +24,7 @@ let getAttributes gameWorldObject =
         | Player pl -> pl.attributes
         | EmptySpace es -> es.attributes
         | Starbase sb -> sb.attributes
+
+let getPlayer game =
+    (game.objects |> Seq.find (function | Player _ -> true | _ -> false)).PlayerValue
 

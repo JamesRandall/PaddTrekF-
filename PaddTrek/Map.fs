@@ -48,7 +48,7 @@ let createQuadrant gameObjects quadrantCoordinate worldSize =
     }
 
 let createCurrentQuadrant (game:Game.Game) =
-    createQuadrant game.objects game.player.attributes.position.quadrant game.size
+    createQuadrant game.objects (Game.getPlayer game).attributes.position.quadrant game.size
 
 let createQuadrantSummaries gameObjects worldSize =
     let objectsInQuadrantForGameObjects = objectsInQuadrant gameObjects

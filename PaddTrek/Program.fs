@@ -16,15 +16,7 @@ let main argv =
                 | _ -> (inputLine.Substring (0,1)).ToUpper(),inputLine.Substring(1).Split(' ')
         let command, args = readInput ()
         Rendering.renderInputComplete ()
-        command, args
-
-    let aiActionRequired func =
-        func ()
-        true
-
-    let noAiActionRequired func =
-        func ()
-        false
+        command, args    
 
     let rec gameLoop gameState =
         let command, args = acceptInput ()

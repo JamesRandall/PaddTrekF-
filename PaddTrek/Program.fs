@@ -2,29 +2,18 @@
 open PaddTrek.Game
 open PaddTrek.GameBuilder
 open System
-open PaddTrek.Ai
 
 [<EntryPoint>]
 let main argv =
     let game = createGame
 
-    let confirmQuit() =
-        Rendering.renderMessage "Press y to confirm you want to quit the game"
-        Console.ReadKey().Key = ConsoleKey.Y
-
-    let createQuadrantFromGame () =
-        Map.createQuadrant game.objects game.player.attributes.position.quadrant game.size
-
     let acceptInput () =
         let readInput () =
             Rendering.renderWaitingForInput ()
             let inputLine = Console.ReadLine ()
-            if inputLine.Length = 0 then
-                "", Array.empty<string>
-            else
-                let command = (inputLine.Substring (0,1)).ToUpper()
-                let args = inputLine.Substring(1).Split(' ')
-                command, args
+            match inputLine with
+                | "" -> "", Array.empty<string>
+                | _ -> (inputLine.Substring (0,1)).ToUpper(),inputLine.Substring(1).Split(' ')
         let command, args = readInput ()
         Rendering.renderInputComplete ()
         command, args
@@ -37,34 +26,13 @@ let main argv =
         func ()
         false
 
-    let renderShortRangeScanner () =
-        Rendering.renderShortRangeScanner (createQuadrantFromGame ())
+    let rec gameLoop gameState =
+        let command, args = acceptInput ()
+        let commandResult = CommandPipeline.processCommand game args command
+        match commandResult.game.gameOver with
+            | true -> gameState
+            | false -> gameLoop commandResult.game
 
-    let renderLongRangeScanner () =
-        Rendering.renderLongRangeScanner game.objects game.size
-    
-    let gameLoop () =
-        let handleAiActionIfRequired actionRequired =
-            if actionRequired then
-                aiTurn game
-            else
-                false
-        Rendering.renderWelcomeMessage ()
-        renderShortRangeScanner ()
-
-        let mutable quit = false
-        while not quit do
-            let command, args = acceptInput ()
-            let gameOver = (match command with
-                                | "Q" -> noAiActionRequired (fun _ -> quit <- confirmQuit())
-                                | "S" -> noAiActionRequired (fun _ -> renderShortRangeScanner ())
-                                | "L" -> noAiActionRequired (fun _ -> renderLongRangeScanner ())
-                                | "?" -> noAiActionRequired (fun _ -> Rendering.renderHelp ())
-                                | _ -> noAiActionRequired (fun _ -> Rendering.renderMessage "Sorry I did not understand that command"))
-                        |> handleAiActionIfRequired
-            
-            quit <- quit || gameOver
-
-    gameLoop ()
-
-    0 // return an integer exit code
+    Rendering.renderWelcomeMessage ()
+    Rendering.renderShortRangeScanner game
+    (gameLoop game).score

@@ -34,4 +34,6 @@ let createGame =
                     Seq.append [Player(player)]
                     )
         player = player
+        score = 0
+        gameOver = false
     }

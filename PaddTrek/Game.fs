@@ -11,6 +11,8 @@ type Game = {
     size: Geography.WorldSize
     objects: GameWorldObject list
     player: Player.Player
+    score: int
+    gameOver: bool
 }
 
 let getAttributes gameWorldObject =

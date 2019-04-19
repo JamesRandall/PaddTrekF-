@@ -1,4 +1,4 @@
 ﻿module PaddTrek.Ai
 
-let aiTurn game =
-    false
+let turn game =
+    game

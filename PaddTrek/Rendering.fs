@@ -17,7 +17,8 @@ let private setDefaultColors () =
     Console.ForegroundColor <- defaultConsoleColor
     Console.BackgroundColor <- ConsoleColor.Black
      
-let renderShortRangeScanner quadrant =
+let renderShortRangeScanner game =
+    let quadrant = Map.createCurrentQuadrant game
     let consoleForegroundColor character =
         match character with
             | 's' | 'c' | 'd' -> ConsoleColor.Red
@@ -61,7 +62,9 @@ let renderShortRangeScanner quadrant =
     
     renderShortRangeScannerToString quadrant |> renderInColor
 
-let renderLongRangeScanner gameObjects worldSize =
+let renderLongRangeScanner game =
+    let gameObjects = game.objects
+    let worldSize = game.size
     let quadrantSummaries = createQuadrantSummaries gameObjects worldSize
     let processRow rowIndex =
         let outputCell colIndex =
@@ -111,3 +114,12 @@ let renderHelp () =
     printLine "S - short range scanner"
     printLine "L - long range scanner"
     printLine "M x y - move within a sector"
+
+
+let renderCommand game args command =
+    match command with
+    | "S" -> renderShortRangeScanner game
+    | "L" -> renderLongRangeScanner game
+    | "?" -> renderHelp ()
+    | "M" -> printf "Moved to position %s,%s" (Seq.toArray args).[0] (Seq.toArray args).[1]
+    | _ -> renderMessage "Sorry I did not understand that command"

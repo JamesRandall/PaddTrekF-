@@ -1,11 +1,10 @@
 module PaddTrek.Map
 open PaddTrek.Models
-open PaddTrek.Game
 open PaddTrek.Geography
 
 type Quadrant = {
-    map: GameWorldObject list list
-    objects: GameWorldObject list
+    map: Game.GameWorldObject list list
+    objects: Game.GameWorldObject list
 }
 
 type QuadrantSummary = {
@@ -17,14 +16,14 @@ type QuadrantSummary = {
 
 let findWithSectorCoordinate gameObjects sectorCoordinate =
     let isAtCoordinate gameObject =
-        (getAttributes gameObject).position = sectorCoordinate
+        (Game.getAttributes gameObject).position = sectorCoordinate
     
     let result = Seq.tryFind isAtCoordinate gameObjects
-    Option.defaultValue (EmptySpace(Space.createEmpty sectorCoordinate)) result
+    Option.defaultValue (Game.EmptySpace(Space.createEmpty sectorCoordinate)) result
 
 let objectsInQuadrant gameObjects quadrantCoordinate  =
     let isInQuadrant gameObject =
-        let attributes = getAttributes gameObject
+        let attributes = Game.getAttributes gameObject
         attributes.position.quadrant = quadrantCoordinate
         
     Seq.filter isInQuadrant gameObjects
@@ -48,6 +47,9 @@ let createQuadrant gameObjects quadrantCoordinate worldSize =
         objects = quadrantObjects
     }
 
+let createCurrentQuadrant (game:Game.Game) =
+    createQuadrant game.objects game.player.attributes.position.quadrant game.size
+
 let createQuadrantSummaries gameObjects worldSize =
     let objectsInQuadrantForGameObjects = objectsInQuadrant gameObjects
 
@@ -55,12 +57,12 @@ let createQuadrantSummaries gameObjects worldSize =
         let objectsForSummary = objectsInQuadrantForGameObjects coordinates
         {
             // which way would be considered "more" F#
-            numberOfEnemies = Seq.fold (fun sum -> function | EnemyShip _ -> sum + 1 | _ -> sum) 0 objectsForSummary
-            numberOfStars = Seq.sumBy (fun gameObject -> match gameObject with | Star _ -> 1 | _ -> 0) objectsForSummary
+            numberOfEnemies = Seq.fold (fun sum -> function | Game.EnemyShip _ -> sum + 1 | _ -> sum) 0 objectsForSummary
+            numberOfStars = Seq.sumBy (fun gameObject -> match gameObject with | Game.Star _ -> 1 | _ -> 0) objectsForSummary
             // are these equivelant - need to test in repl
-            hasStarbase = Seq.exists (function | Starbase _ -> true | _ -> false) objectsForSummary
+            hasStarbase = Seq.exists (function | Game.Starbase _ -> true | _ -> false) objectsForSummary
             //starbase = Seq.exists (fun gameObject -> match gameObject with | Starbase _ -> true | _ -> false) objectsForSummary
-            hasPlayer = Seq.exists (function | Player _ -> true | _ -> false) objectsForSummary
+            hasPlayer = Seq.exists (function | Game.Player _ -> true | _ -> false) objectsForSummary
         }
 
     let createSummaryRow y =

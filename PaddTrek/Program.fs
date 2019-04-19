@@ -21,7 +21,7 @@ let main argv =
             let inputLine = Console.ReadLine ()
             match inputLine with
                 | "" -> "", Array.empty<string>
-                | _ -> (inputLine.Substring (0,1)).ToUpper(),inputLine.Substring(1).Split(' ')
+                | _ -> (inputLine.Substring (0,1)).ToUpper(),inputLine.Substring(1).Trim().Split(' ')
         let commandString, args = readInput ()
         let command = match commandString with
             | "M" -> Command(GameAction.MoveSector)

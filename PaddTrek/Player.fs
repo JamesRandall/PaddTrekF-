@@ -46,3 +46,15 @@ let create position  =
         }
     }
 
+let energyToMovePlayerToSector player coordinates =
+    let energyConsumption = 10
+    let distance = Geography.distanceBetweenCoordinates coordinates player.attributes.position.sector
+    distance * energyConsumption
+
+let moveToSector player coordinates =
+    {
+        player with
+            attributes = { player.attributes with position = { player.attributes.position with sector = coordinates}}
+            energy = { player.energy with value = player.energy.value - (energyToMovePlayerToSector player coordinates) }
+    }
+

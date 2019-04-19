@@ -110,11 +110,18 @@ let renderMessage text =
     printLine text
 
 let renderHelp () =
+    Console.ForegroundColor <- defaultConsoleColor
     printLine "Q - quit the game"
     printLine "S - short range scanner"
     printLine "L - long range scanner"
     printLine "M x y - move within a sector"
+    printLine "E - show energy levels"
+    printLine "U - shields up"
+    printLine "D - shields down"
 
+let renderError message =
+    Console.ForegroundColor <- ConsoleColor.DarkRed
+    printLine message
 
 let renderCommand game args command =
     match command with

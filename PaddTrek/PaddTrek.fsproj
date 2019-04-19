@@ -17,8 +17,8 @@
       <Compile Include="Game.fs" />
       <Compile Include="Map.fs" />
       <Compile Include="GameBuilder.fs" />
-      <Compile Include="Rendering.fs" />
       <Compile Include="Ai.fs" />
+      <Compile Include="Rendering.fs" />
       <Compile Include="CommandPipeline.fs" />
       <Compile Include="Program.fs" />
       <None Include="GameBuilderScratch.fsx" />

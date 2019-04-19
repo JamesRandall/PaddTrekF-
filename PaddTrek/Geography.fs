@@ -42,3 +42,22 @@ let nonClashingRandomGalacticPosition (existingCoordinates:ISet<GalacticCoordina
             candidatePosition
 
     getNewPosition ()
+
+let createCoordinateWithStrings args = 
+    let intArgs = args |> Seq.map (fun arg -> System.Int32.Parse(arg)) |> Seq.toArray
+    {
+        x = intArgs.[0]
+        y = intArgs.[1]
+    }
+
+let createGalacticCoordinate quadrantCoord sectorCoord =
+    {
+        quadrant = quadrantCoord
+        sector = sectorCoord
+    }
+
+let distanceBetweenCoordinates coord1 coord2 =
+    let width = abs(coord1.x - coord2.x)
+    let height = abs(coord1.y - coord2.y)
+    let distance = ceil(sqrt(float(width*width + height*height)))
+    int(distance)

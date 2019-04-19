@@ -118,8 +118,7 @@ let renderHelp () =
 
 let renderCommand game args command =
     match command with
-    | "S" -> renderShortRangeScanner game
-    | "L" -> renderLongRangeScanner game
-    | "?" -> renderHelp ()
-    | "M" -> printf "Moved to position %s,%s" (Seq.toArray args).[0] (Seq.toArray args).[1]
+    | GameAction.ShortRangeScanner | GameAction.MoveSector | GameAction.MoveQuadrant -> renderShortRangeScanner game
+    | GameAction.LongRangeScanner -> renderLongRangeScanner game
+    // | "M" -> printf "Moved to position %s,%s" (Seq.toArray args).[0] (Seq.toArray args).[1]
     | _ -> renderMessage "Sorry I did not understand that command"

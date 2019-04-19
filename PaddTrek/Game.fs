@@ -1,5 +1,11 @@
 ﻿module PaddTrek.Game
 
+type GameAction =
+    | MoveSector
+    | MoveQuadrant
+    | ShortRangeScanner
+    | LongRangeScanner
+
 type GameWorldObject =
     | EnemyShip of Enemies.EnemyShip
     | Star of Space.Star

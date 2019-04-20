@@ -10,10 +10,6 @@ type Output =
     | ForegroundColor of ConsoleColor
     | BackgroundColor of ConsoleColor
     | Seq of seq<Output>
-    static member (+) (left: Output, right: Output) =
-        [left ; right] :> seq<Output>
-    static member (+) (left: seq<Output>, right: Output) =
-        Seq.append left [right]
 
     
 let write content =

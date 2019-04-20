@@ -101,7 +101,7 @@ let renderLongRangeScanner game =
     let processRow rowIndex =
         let outputCell colIndex =
             let cell = quadrantSummaries.[rowIndex].[colIndex]
-            let cellOutput = [
+            [
                 BackgroundColor(match cell.hasPlayer with | true -> ConsoleColor.Blue | false -> ConsoleColor.Black) ;
                 ForegroundColor(match cell.numberOfStars with | 0 -> defaultConsoleColor | _ -> ConsoleColor.DarkYellow) ;
                 String(sprintf " %d " cell.numberOfStars) ;
@@ -110,9 +110,8 @@ let renderLongRangeScanner game =
                 ForegroundColor(match cell.numberOfEnemies with | 0 -> defaultConsoleColor | _ -> ConsoleColor.Red) ;
                 String(sprintf "%d  " cell.numberOfEnemies)
             ]
-            cellOutput
         
-        let result = [
+        [
              HeaderColor ;
              String(sprintf "%d" rowIndex) ;
              DefaultColor ;
@@ -120,33 +119,32 @@ let renderLongRangeScanner game =
              Seq(Seq.map outputCell [0..quadrantSummaries.[rowIndex].Length-1] |> Seq.concat) ;
              NewLine
         ]
-        result
 
-    let headerLine = (
-                         HeaderColor +
-                         String("  ") +
-                         String(((Seq.map (fun i -> sprintf "   %d    " i) [0..worldSize.quadrantSize.width-1]) |> Seq.fold(+) "")) +
+    let headerLine = [
+                         HeaderColor ;
+                         String("  ") ;
+                         String(((Seq.map (fun i -> sprintf "   %d    " i) [0..worldSize.quadrantSize.width-1]) |> Seq.fold(+) "")) ;
                          NewLine
-                     )    
+                     ]    
     let consoleOutput = (Seq.map processRow [0..quadrantSummaries.Length-1] |> Seq.concat) |> Seq.append [DefaultColor]
-    write (consoleOutput |> Seq.append headerLine)
+    consoleOutput |> Seq.append headerLine |> write
     
 let renderWelcomeMessage () =
-    write (
-        DefaultColor +
-        Line("Welcome to PaddTrek F#") +
-        Line("The galaxy is under attack and your ship is the last hope against the invaders.") +
-        Line("Press ? at any time to see the list of commands you can give your crew.") +
+    [
+        DefaultColor ;
+        Line("Welcome to PaddTrek F#") ;
+        Line("The galaxy is under attack and your ship is the last hope against the invaders.") ;
+        Line("Press ? at any time to see the list of commands you can give your crew.") ;
         NewLine        
-    )
+    ] |> write
 
-let renderRange (description, range:Range.Range) =
+let private renderRange (description, range:Range.Range) =
     let percentage = 100 * range.value / range.max
-    write (
-        DefaultColor +
-        ForegroundColor(if percentage < 15 then ConsoleColor.Red elif percentage < 30 then ConsoleColor.Yellow else ConsoleColor.Green) +
+    [
+        DefaultColor ;
+        ForegroundColor(if percentage < 15 then ConsoleColor.Red elif percentage < 30 then ConsoleColor.Yellow else ConsoleColor.Green) ;
         Line(sprintf "%s %d/%d (%d%%)" description range.value range.max percentage)
-    )
+    ]
 
 let renderEnergyLevels game =
     let player = game |> Game.getPlayer
@@ -156,29 +154,28 @@ let renderEnergyLevels game =
         ("Port shields", player.shields.port)
         ("Aft shields", player.shields.aft)
         ("Starboard shields", player.shields.starboard)
-    ] |> Seq.iter renderRange
+    ] |> Seq.map renderRange |> Seq.concat |> write
     
-
 let renderWaitingForInput () =
-    printf "\n> "
+    [ NewLine ; String("> ") ] |> write
 
 let renderInputComplete () =
-    printf "\n"
+    [ NewLine ] |> write
 
 let renderMessage text =
     Console.ForegroundColor <- defaultConsoleColor
     printLine text
 
 let renderHelp () =
-    write [
-            DefaultColor ;
-            Line("Q - quit the game") ;
-            Line("S - short range scanner") ;
-            Line("M x y - move within a sector") ;
-            Line("E - show energy levels") ;
-            Line("U - shields up") ;
-            Line("D - shields down")
-          ]
+    [
+        DefaultColor ;
+        Line("Q - quit the game") ;
+        Line("S - short range scanner") ;
+        Line("M x y - move within a sector") ;
+        Line("E - show energy levels") ;
+        Line("U - shields up") ;
+        Line("D - shields down")
+    ] |> write
 
 let renderError message =
     Console.ForegroundColor <- ConsoleColor.DarkRed

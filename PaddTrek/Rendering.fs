@@ -1,6 +1,5 @@
 module PaddTrek.Rendering
 open System
-open PaddTrek.Models
 open PaddTrek.Enemies
 open PaddTrek.Map
 open PaddTrek.Game
@@ -123,9 +122,9 @@ let renderError message =
     Console.ForegroundColor <- ConsoleColor.DarkRed
     printLine message
 
-let renderCommand game args command =
+let renderCommand game command =
     match command with
-    | GameAction.ShortRangeScanner | GameAction.MoveSector | GameAction.MoveQuadrant -> renderShortRangeScanner game
+    | GameAction.ShortRangeScanner | GameAction.MoveQuadrant -> renderShortRangeScanner game
     | GameAction.LongRangeScanner -> renderLongRangeScanner game
-    // | "M" -> printf "Moved to position %s,%s" (Seq.toArray args).[0] (Seq.toArray args).[1]
+    | GameAction.MoveSector coords -> renderShortRangeScanner game ; printf "Moved to position %d,%d" coords.x coords.y
     | _ -> renderMessage "Sorry I did not understand that command"

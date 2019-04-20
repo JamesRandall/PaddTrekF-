@@ -5,7 +5,6 @@ open PaddTrek.Geography;
 type PipelineCommand = {
     game: Game.Game
     action: Game.GameAction
-    args: seq<string>
     output: string
     aiActionRequired: bool
     continueToProcess: bool
@@ -15,7 +14,7 @@ type PipelineCommand = {
     not yet sure I actually like this approach here - of piping validation ahead of execution - but I wanted to
     experimented with some language features
 *)
-let processGameAction game args action =
+let processGameAction game action =
     let continueWith command = command
 
     // implies an AI action is required
@@ -32,49 +31,53 @@ let processGameAction game args action =
             | _ -> continueWith command
     
     let validateCommand command =
-        let isValidCoordinateArg (arg:string) (size:Geography.Size) =
-            match System.Int32.TryParse arg with
-            | (true, number) -> number >=0 && number < size.width
-            | (false, _)  -> false
+        
 
         let validate message isValid =
             match isValid with
                 | true -> continueWith command
                 | false -> stopWith message command
-
-        let validateMoveSector () =
-            // TODO: Validate energy requirements!
+                
+        let validateEnergyRequirements energyRequired cmd =
+            cmd |> 
+                if cmd.continueToProcess then
+                    if player.energy.value > energyRequired then
+                        continueWith
+                    else
+                        stopWith "Insufficient energy to do that"
+                else
+                    continueWith
+                
+        let validateMoveSector args =
             (
-                command.args |> Seq.length = 2 &&
-                command.args |> Seq.fold(fun valid arg -> valid && (isValidCoordinateArg arg command.game.size.sectorSize)) true &&
-                command.args |> Geography.createCoordinateWithStrings
-                             |> createGalacticCoordinate player.attributes.position.quadrant
-                             |> Map.findWithSectorCoordinate command.game.objects
-                             |> isEmptySpace
-            ) |> validate "Cannot move there"
+                args |> createGalacticCoordinate player.attributes.position.quadrant
+                     |> Map.findWithSectorCoordinate command.game.objects
+                     |> isEmptySpace
+            )
+            |> validate "Cannot move there"
+            |> validateEnergyRequirements (Player.energyToMovePlayerToSector player args)
 
         match command.action with
-            | GameAction.MoveSector -> validateMoveSector ()
+            | MoveSector args -> validateMoveSector args
             | GameAction.ShortRangeScanner | GameAction.LongRangeScanner -> continueWith command
             | _ -> stopWith "" command
     
     let executeCommand command =
         match command.action with
-        | GameAction.MoveSector ->  movePlayerToSector command.game (createCoordinateWithStrings command.args) |> continueWithNewGameState command
+        | MoveSector args ->  movePlayerToSector command.game args |> continueWithNewGameState command
         | _ -> continueWith command
     
     let renderCommand command =
         if not command.continueToProcess then
             Rendering.renderError command.output
         else 
-            Rendering.renderCommand command.game command.args command.action
+            Rendering.renderCommand command.game command.action
         continueWith command
 
     let command =
         {
             game = game
             action = action
-            args = args
             output = ""
             aiActionRequired = false
             continueToProcess = true

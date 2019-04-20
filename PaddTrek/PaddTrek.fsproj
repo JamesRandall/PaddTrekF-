@@ -20,8 +20,8 @@
       <Compile Include="Ai.fs" />
       <Compile Include="Rendering.fs" />
       <Compile Include="CommandPipeline.fs" />
+      <Compile Include="ConsoleInput.fs" />
       <Compile Include="Program.fs" />
-      <None Include="GameBuilderScratch.fsx" />
     </ItemGroup>
 
 </Project>

@@ -16,6 +16,7 @@
       <Compile Include="Enemies.fs" />
       <Compile Include="Game.fs" />
       <Compile Include="Map.fs" />
+      <Compile Include="PlayerAction.fs" />
       <Compile Include="GameBuilder.fs" />
       <Compile Include="Ai.fs" />
       <Compile Include="Rendering.fs" />

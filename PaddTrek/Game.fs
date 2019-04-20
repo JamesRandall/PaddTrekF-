@@ -1,11 +1,4 @@
 ﻿module PaddTrek.Game
-open PaddTrek.Geography
-
-type GameAction =
-    | MoveSector of Coordinate
-    | MoveQuadrant
-    | ShortRangeScanner
-    | LongRangeScanner
 
 type GameWorldObject =
     | EnemyShip of Enemies.EnemyShip

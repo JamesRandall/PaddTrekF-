@@ -124,7 +124,6 @@ let renderError message =
 
 let renderCommand game command =
     match command with
-    | GameAction.ShortRangeScanner | GameAction.MoveQuadrant -> renderShortRangeScanner game
-    | GameAction.LongRangeScanner -> renderLongRangeScanner game
-    | GameAction.MoveSector coords -> renderShortRangeScanner game ; printf "Moved to position %d,%d" coords.x coords.y
-    | _ -> renderMessage "Sorry I did not understand that command"
+    | PlayerAction.ShortRangeScanner | PlayerAction.MoveQuadrant -> renderShortRangeScanner game
+    | PlayerAction.LongRangeScanner -> renderLongRangeScanner game
+    | PlayerAction.MoveSector coords -> renderShortRangeScanner game ; printf "Moved to position %d,%d" coords.x coords.y

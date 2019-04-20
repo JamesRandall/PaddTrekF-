@@ -1,17 +1,17 @@
 module PaddTrek.ConsoleInput
 
 type ConsoleCommand =
-    | Command of Game.GameAction
+    | Command of PlayerAction.Action
     | Quit
     | Help
     | Error
     
 let private createCommand commandString args =
     match commandString with
-        | "M" -> Command(Game.GameAction.MoveSector(Geography.createCoordinateWithStrings args))
-        | "G" -> Command(Game.GameAction.MoveQuadrant)
-        | "S" -> Command(Game.GameAction.ShortRangeScanner)
-        | "L" -> Command(Game.GameAction.LongRangeScanner)
+        | "M" -> Command(PlayerAction.Action.MoveSector(Geography.createCoordinateWithStrings args))
+        | "G" -> Command(PlayerAction.Action.MoveQuadrant)
+        | "S" -> Command(PlayerAction.Action.ShortRangeScanner)
+        | "L" -> Command(PlayerAction.Action.LongRangeScanner)
         | "Q" -> ConsoleCommand.Quit
         | "?" -> ConsoleCommand.Help
         | _ -> ConsoleCommand.Error
@@ -45,4 +45,4 @@ let acceptInput game =
                             
         match errorMessage with
             | "" -> createCommand commandString args
-            | _ -> ConsoleCommand.Error 
+            | _ -> Rendering.renderError errorMessage ; ConsoleCommand.Error 

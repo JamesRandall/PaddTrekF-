@@ -1,10 +1,9 @@
 ﻿module PaddTrek.CommandPipeline
 open PaddTrek.Game
-open PaddTrek.Geography;
 
 type PipelineCommand = {
     game: Game.Game
-    action: Game.GameAction
+    action: PlayerAction.Action
     output: string
     aiActionRequired: bool
     continueToProcess: bool
@@ -31,41 +30,13 @@ let processGameAction game action =
             | _ -> continueWith command
     
     let validateCommand command =
-        
-
-        let validate message isValid =
-            match isValid with
-                | true -> continueWith command
-                | false -> stopWith message command
-                
-        let validateEnergyRequirements energyRequired cmd =
-            cmd |> 
-                if cmd.continueToProcess then
-                    if player.energy.value > energyRequired then
-                        continueWith
-                    else
-                        stopWith "Insufficient energy to do that"
-                else
-                    continueWith
-                
-        let validateMoveSector args =
-            (
-                args |> createGalacticCoordinate player.attributes.position.quadrant
-                     |> Map.findWithSectorCoordinate command.game.objects
-                     |> isEmptySpace
-            )
-            |> validate "Cannot move there"
-            |> validateEnergyRequirements (Player.energyToMovePlayerToSector player args)
-
-        match command.action with
-            | MoveSector args -> validateMoveSector args
-            | GameAction.ShortRangeScanner | GameAction.LongRangeScanner -> continueWith command
-            | _ -> stopWith "" command
+        let validationResult = PlayerAction.validate command.game command.action
+        match validationResult.isValid with
+            | true -> command |> continueWith
+            | false -> command |> stopWith validationResult.message
     
     let executeCommand command =
-        match command.action with
-        | MoveSector args ->  movePlayerToSector command.game args |> continueWithNewGameState command
-        | _ -> continueWith command
+        command.action |> PlayerAction.execute command.game |> continueWithNewGameState command
     
     let renderCommand command =
         if not command.continueToProcess then

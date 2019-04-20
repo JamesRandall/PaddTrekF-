@@ -63,36 +63,6 @@ let renderShortRangeScanner game =
             )
     
     renderShortRangeScannerToString quadrant |> renderInColor
-
-let renderLongRangeScannerOld game =
-    let gameObjects = game.objects
-    let worldSize = game.size
-    let quadrantSummaries = createQuadrantSummaries gameObjects worldSize
-    let processRow rowIndex =
-        let outputCell colIndex =
-            let cell = quadrantSummaries.[rowIndex].[colIndex]
-            Console.BackgroundColor <- if cell.hasPlayer then ConsoleColor.Blue else ConsoleColor.Black
-
-            Console.ForegroundColor <- if cell.numberOfStars = 0 then defaultConsoleColor else ConsoleColor.DarkYellow
-            printf " %d " cell.numberOfStars
-            Console.ForegroundColor <- if cell.hasStarbase then ConsoleColor.Blue else defaultConsoleColor
-            printf "%s " (if cell.hasStarbase then "S" else "0")
-            Console.ForegroundColor <- if cell.numberOfEnemies = 0 then defaultConsoleColor else ConsoleColor.Red
-            printf "%d  " cell.numberOfEnemies
-
-        setHeaderColors ()
-        printf "%d" rowIndex
-        setDefaultColors ()
-        printf " "
-        Seq.iter outputCell [0..quadrantSummaries.[rowIndex].Length-1]
-        printf "\n"
-
-    let headerLine = "  " + ((Seq.map (fun i -> sprintf "   %d    " i) [0..worldSize.quadrantSize.width-1]) |> Seq.fold(+) "") + "\n"
-
-    setHeaderColors ()
-    printf "%s" headerLine
-    setDefaultColors ()
-    Seq.iter processRow [0..quadrantSummaries.Length-1]
     
 let renderLongRangeScanner game =
     let gameObjects = game.objects

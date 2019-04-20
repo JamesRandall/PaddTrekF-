@@ -19,6 +19,7 @@
       <Compile Include="PlayerAction.fs" />
       <Compile Include="GameBuilder.fs" />
       <Compile Include="Ai.fs" />
+      <Compile Include="ConsoleOutput.fs" />
       <Compile Include="Rendering.fs" />
       <Compile Include="CommandPipeline.fs" />
       <Compile Include="ConsoleInput.fs" />

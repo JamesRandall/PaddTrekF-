@@ -12,6 +12,7 @@ let private createCommand commandString args =
         | "G" -> Command(PlayerAction.Action.MoveQuadrant)
         | "S" -> Command(PlayerAction.Action.ShortRangeScanner)
         | "L" -> Command(PlayerAction.Action.LongRangeScanner)
+        | "E" -> Command(PlayerAction.Action.EnergyLevels)
         | "Q" -> ConsoleCommand.Quit
         | "?" -> ConsoleCommand.Help
         | _ -> ConsoleCommand.Error

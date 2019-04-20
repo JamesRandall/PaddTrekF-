@@ -7,6 +7,7 @@ type Action =
     | MoveQuadrant
     | ShortRangeScanner
     | LongRangeScanner
+    | EnergyLevels
     
 type ActionValidation = {
     isValid: bool

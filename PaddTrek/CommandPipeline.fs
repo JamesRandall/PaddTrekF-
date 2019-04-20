@@ -9,42 +9,37 @@ type PipelineCommand = {
     continueToProcess: bool
 }
     
-(*
-    not yet sure I actually like this approach here - of piping validation ahead of execution - but I wanted to
-    experimented with some language features
-*)
-let processGameAction game action =
-    let continueWith command = command
+let private continueWith command = command
 
-    // implies an AI action is required
-    let continueWithNewGameState command newGameState = { command with aiActionRequired = true; game = newGameState }
+let private continueWithNewGameState command newGameState = { command with aiActionRequired = true; game = newGameState }
     
-    let stopWith message command = { command with continueToProcess = false ; output = message }
+let private stopWith message command = { command with continueToProcess = false ; output = message }
 
-    let player = game |> getPlayer
-    
-    let handleAiActionIfRequired command =
+let private handleAiActionIfRequired command =
         match command.aiActionRequired with
             | true -> 
-                { command with game = Ai.turn game }
+                { command with game = Ai.turn command.game }
             | _ -> continueWith command
-    
-    let validateCommand command =
+            
+let private validateCommand command =
         let validationResult = PlayerAction.validate command.game command.action
         match validationResult.isValid with
             | true -> command |> continueWith
             | false -> command |> stopWith validationResult.message
     
-    let executeCommand command =
-        command.action |> PlayerAction.execute command.game |> continueWithNewGameState command
-    
-    let renderCommand command =
-        if not command.continueToProcess then
-            Rendering.renderError command.output
-        else 
-            Rendering.renderCommand command.game command.action
-        continueWith command
+let private executeCommand command =
+    command.action |> PlayerAction.execute command.game |> continueWithNewGameState command
 
+let private renderCommand command =
+    if not command.continueToProcess then
+        Rendering.renderError command.output
+    else 
+        Rendering.renderCommand command.game command.action
+    continueWith command
+
+let processGameAction game action =
+    // implies an AI action is required
+    let player = game |> getPlayer
     let command =
         {
             game = game

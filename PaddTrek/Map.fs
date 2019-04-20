@@ -50,25 +50,26 @@ let createQuadrant gameObjects quadrantCoordinate worldSize =
 let createCurrentQuadrant (game:Game.Game) =
     createQuadrant game.objects (Game.getPlayer game).attributes.position.quadrant game.size
 
+let private summarise gameObjects =
+    {
+        numberOfEnemies = gameObjects |> Seq.sumBy (function | Game.EnemyShip _ -> 1 | _ -> 0)
+        numberOfStars = gameObjects |> Seq.sumBy (function | Game.Star _ -> 1 | _ -> 0)
+        hasStarbase = gameObjects |> Seq.exists (function | Game.Starbase _ -> true | _ -> false)
+        hasPlayer = gameObjects |> Seq.exists (function | Game.Player _ -> true | _ -> false)
+    }
+    
+let createQuadrantSummary game coords =
+    let objectsInQuadrant = objectsInQuadrant game.objects coords
+    summarise objectsInQuadrant
+
 let createQuadrantSummaries gameObjects worldSize =
     let objectsInQuadrantForGameObjects = objectsInQuadrant gameObjects
 
-    let createSummaryCell coordinates =
-        let objectsForSummary = objectsInQuadrantForGameObjects coordinates
-        {
-            // which way would be considered "more" F#
-            numberOfEnemies = Seq.fold (fun sum -> function | Game.EnemyShip _ -> sum + 1 | _ -> sum) 0 objectsForSummary
-            numberOfStars = Seq.sumBy (fun gameObject -> match gameObject with | Game.Star _ -> 1 | _ -> 0) objectsForSummary
-            // are these equivelant - need to test in repl
-            hasStarbase = Seq.exists (function | Game.Starbase _ -> true | _ -> false) objectsForSummary
-            //starbase = Seq.exists (fun gameObject -> match gameObject with | Starbase _ -> true | _ -> false) objectsForSummary
-            hasPlayer = Seq.exists (function | Game.Player _ -> true | _ -> false) objectsForSummary
-        }
-
     let createSummaryRow y =
-        Seq.toArray (Seq.map (fun x -> createSummaryCell { x=x; y=y} ) [0..worldSize.quadrantSize.width-1])
+        Seq.toArray (Seq.map (fun x -> summarise (objectsInQuadrantForGameObjects { x=x; y=y}) ) [0..worldSize.quadrantSize.width-1])
 
     let galaxyArray = Seq.toArray (
                         Seq.map createSummaryRow [0..worldSize.quadrantSize.height-1])
     
     galaxyArray
+

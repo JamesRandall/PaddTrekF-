@@ -1,8 +1,11 @@
 module PaddTrek.Rendering
+open PaddTrek
+open System
 open System
 open PaddTrek.Enemies
 open PaddTrek.Map
 open PaddTrek.Game
+open ConsoleOutput
 
 let private defaultConsoleColor = ConsoleColor.Green
 
@@ -61,7 +64,7 @@ let renderShortRangeScanner game =
     
     renderShortRangeScannerToString quadrant |> renderInColor
 
-let renderLongRangeScanner game =
+let renderLongRangeScannerOld game =
     let gameObjects = game.objects
     let worldSize = game.size
     let quadrantSummaries = createQuadrantSummaries gameObjects worldSize
@@ -91,12 +94,68 @@ let renderLongRangeScanner game =
     setDefaultColors ()
     Seq.iter processRow [0..quadrantSummaries.Length-1]
     
+let renderLongRangeScanner game =
+    let gameObjects = game.objects
+    let worldSize = game.size
+    let quadrantSummaries = createQuadrantSummaries gameObjects worldSize
+    let processRow rowIndex =
+        let outputCell colIndex =
+            let cell = quadrantSummaries.[rowIndex].[colIndex]
+            let cellOutput = (
+                BackgroundColor(if cell.hasPlayer then ConsoleColor.Blue else ConsoleColor.Black) +
+                ForegroundColor(if cell.numberOfStars = 0 then defaultConsoleColor else ConsoleColor.DarkYellow) +
+                String(sprintf " %d " cell.numberOfStars) +
+                ForegroundColor(if cell.hasStarbase then ConsoleColor.Blue else defaultConsoleColor) +
+                String(sprintf "%s " (if cell.hasStarbase then "S" else "0")) +
+                ForegroundColor(if cell.numberOfEnemies = 0 then defaultConsoleColor else ConsoleColor.Red) +
+                String(sprintf "%d  " cell.numberOfEnemies)
+            )
+            cellOutput
+        
+        let result = HeaderColor +
+             String(sprintf "%d" rowIndex) +
+             DefaultColor +
+             String(" ") +
+             Seq(Seq.map outputCell [0..quadrantSummaries.[rowIndex].Length-1] |> Seq.concat) +
+             NewLine
+        result
+
+    let headerLine = (
+                         HeaderColor +
+                         String("  ") +
+                         String(((Seq.map (fun i -> sprintf "   %d    " i) [0..worldSize.quadrantSize.width-1]) |> Seq.fold(+) "")) +
+                         NewLine
+                     )    
+    let consoleOutput = headerLine |> Seq.append (Seq.map processRow [0..quadrantSummaries.Length-1] |> Seq.concat) |> Seq.append [DefaultColor]
+    write consoleOutput
+    
 let renderWelcomeMessage () =
-    Console.ForegroundColor <- defaultConsoleColor
-    printLine "Welcome to PaddTrek F#"
-    printLine "The galaxy is under attack and your ship is the last hope against the invaders."
-    printLine "Press ? at any time to see the list of commands you can give your crew."
-    printf "\n"
+    write (
+        DefaultColor +
+        Line("Welcome to PaddTrek F#") +
+        Line("The galaxy is under attack and your ship is the last hope against the invaders.") +
+        Line("Press ? at any time to see the list of commands you can give your crew.") +
+        NewLine        
+    )
+
+let renderRange (description, range:Range.Range) =
+    let percentage = 100 * range.value / range.max
+    write (
+        DefaultColor +
+        ForegroundColor(if percentage < 15 then ConsoleColor.Red elif percentage < 30 then ConsoleColor.Yellow else ConsoleColor.Green) +
+        Line(sprintf "%s %d/%d (%d%%)" description range.value range.max percentage)
+    )
+
+let renderEnergyLevels game =
+    let player = game |> Game.getPlayer
+    [
+        ("Main energy", player.energy)
+        ("Fore shields", player.shields.fore)
+        ("Port shields", player.shields.port)
+        ("Aft shields", player.shields.aft)
+        ("Starboard shields", player.shields.starboard)
+    ] |> Seq.iter renderRange
+    
 
 let renderWaitingForInput () =
     printf "\n> "
@@ -109,14 +168,15 @@ let renderMessage text =
     printLine text
 
 let renderHelp () =
-    Console.ForegroundColor <- defaultConsoleColor
-    printLine "Q - quit the game"
-    printLine "S - short range scanner"
-    printLine "L - long range scanner"
-    printLine "M x y - move within a sector"
-    printLine "E - show energy levels"
-    printLine "U - shields up"
-    printLine "D - shields down"
+    write (
+            DefaultColor +
+            Line("Q - quit the game") +
+            Line("S - short range scanner") +
+            Line("M x y - move within a sector") +
+            Line("E - show energy levels") +
+            Line("U - shields up") +
+            Line("D - shields down")
+          )
 
 let renderError message =
     Console.ForegroundColor <- ConsoleColor.DarkRed
@@ -127,3 +187,4 @@ let renderCommand game command =
     | PlayerAction.ShortRangeScanner | PlayerAction.MoveQuadrant -> renderShortRangeScanner game
     | PlayerAction.LongRangeScanner -> renderLongRangeScanner game
     | PlayerAction.MoveSector coords -> renderShortRangeScanner game ; printf "Moved to position %d,%d" coords.x coords.y
+    | PlayerAction.EnergyLevels -> renderEnergyLevels game

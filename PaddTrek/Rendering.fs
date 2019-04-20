@@ -101,23 +101,25 @@ let renderLongRangeScanner game =
     let processRow rowIndex =
         let outputCell colIndex =
             let cell = quadrantSummaries.[rowIndex].[colIndex]
-            let cellOutput = (
-                BackgroundColor(if cell.hasPlayer then ConsoleColor.Blue else ConsoleColor.Black) +
-                ForegroundColor(if cell.numberOfStars = 0 then defaultConsoleColor else ConsoleColor.DarkYellow) +
-                String(sprintf " %d " cell.numberOfStars) +
-                ForegroundColor(if cell.hasStarbase then ConsoleColor.Blue else defaultConsoleColor) +
-                String(sprintf "%s " (if cell.hasStarbase then "S" else "0")) +
-                ForegroundColor(if cell.numberOfEnemies = 0 then defaultConsoleColor else ConsoleColor.Red) +
+            let cellOutput = [
+                BackgroundColor(match cell.hasPlayer with | true -> ConsoleColor.Blue | false -> ConsoleColor.Black) ;
+                ForegroundColor(match cell.numberOfStars with | 0 -> defaultConsoleColor | _ -> ConsoleColor.DarkYellow) ;
+                String(sprintf " %d " cell.numberOfStars) ;
+                ForegroundColor(match cell.hasStarbase with | true -> ConsoleColor.Blue | false -> defaultConsoleColor) ;
+                String(sprintf "%s " (if cell.hasStarbase then "S" else "0")) ;
+                ForegroundColor(match cell.numberOfEnemies with | 0 -> defaultConsoleColor | _ -> ConsoleColor.Red) ;
                 String(sprintf "%d  " cell.numberOfEnemies)
-            )
+            ]
             cellOutput
         
-        let result = HeaderColor +
-             String(sprintf "%d" rowIndex) +
-             DefaultColor +
-             String(" ") +
-             Seq(Seq.map outputCell [0..quadrantSummaries.[rowIndex].Length-1] |> Seq.concat) +
+        let result = [
+             HeaderColor ;
+             String(sprintf "%d" rowIndex) ;
+             DefaultColor ;
+             String(" ") ;
+             Seq(Seq.map outputCell [0..quadrantSummaries.[rowIndex].Length-1] |> Seq.concat) ;
              NewLine
+        ]
         result
 
     let headerLine = (
@@ -126,8 +128,8 @@ let renderLongRangeScanner game =
                          String(((Seq.map (fun i -> sprintf "   %d    " i) [0..worldSize.quadrantSize.width-1]) |> Seq.fold(+) "")) +
                          NewLine
                      )    
-    let consoleOutput = headerLine |> Seq.append (Seq.map processRow [0..quadrantSummaries.Length-1] |> Seq.concat) |> Seq.append [DefaultColor]
-    write consoleOutput
+    let consoleOutput = (Seq.map processRow [0..quadrantSummaries.Length-1] |> Seq.concat) |> Seq.append [DefaultColor]
+    write (consoleOutput |> Seq.append headerLine)
     
 let renderWelcomeMessage () =
     write (
@@ -168,15 +170,15 @@ let renderMessage text =
     printLine text
 
 let renderHelp () =
-    write (
-            DefaultColor +
-            Line("Q - quit the game") +
-            Line("S - short range scanner") +
-            Line("M x y - move within a sector") +
-            Line("E - show energy levels") +
-            Line("U - shields up") +
+    write [
+            DefaultColor ;
+            Line("Q - quit the game") ;
+            Line("S - short range scanner") ;
+            Line("M x y - move within a sector") ;
+            Line("E - show energy levels") ;
+            Line("U - shields up") ;
             Line("D - shields down")
-          )
+          ]
 
 let renderError message =
     Console.ForegroundColor <- ConsoleColor.DarkRed

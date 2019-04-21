@@ -1,68 +1,65 @@
 module PaddTrek.Rendering
 open PaddTrek
 open System
-open System
 open PaddTrek.Enemies
 open PaddTrek.Map
 open PaddTrek.Game
 open ConsoleOutput
-
-let private defaultConsoleColor = ConsoleColor.Green
-
-let private printLine text =
-    printf "%s\n" text
-
-let private setHeaderColors () =
-    Console.ForegroundColor <- ConsoleColor.Black
-    Console.BackgroundColor <- defaultConsoleColor
-let private setDefaultColors () =
-    Console.ForegroundColor <- defaultConsoleColor
-    Console.BackgroundColor <- ConsoleColor.Black
-     
+    
 let renderShortRangeScanner game =
     let quadrant = Map.createCurrentQuadrant game
     let consoleForegroundColor character =
         match character with
-            | 's' | 'c' | 'd' -> ConsoleColor.Red
-            | '*' -> ConsoleColor.DarkYellow
-            | 'p' | 'b' -> ConsoleColor.Blue
-            | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> ConsoleColor.Black
-            | _ -> defaultConsoleColor
+            | EnemyShip _ -> ForegroundColor(ConsoleColor.Red)
+            | Star _ -> ForegroundColor(ConsoleColor.DarkYellow)
+            | Player _ -> ForegroundColor(ConsoleColor.Blue)
+            | Starbase _ -> ForegroundColor(ConsoleColor.Blue)
+            | _ -> DefaultForegroundColor
 
-    let consoleBackgroundColor character =
-        match character with
-            | '_' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> defaultConsoleColor
-            | _ -> ConsoleColor.Black
-    
     let enemyShipCharacter enemyShip =
         match enemyShip.enemyType with
-            | EnemyType.Scout -> "s"
-            | EnemyType.Cruiser -> "c"
-            | EnemyType.Dreadnought -> "d"
+            | EnemyType.Scout -> String("s")
+            | EnemyType.Cruiser -> String("c")
+            | EnemyType.Dreadnought -> String("d")
         
     let getGameObjectCharacter gameWorldObject =
         match gameWorldObject with
             | GameWorldObject.EnemyShip enemy -> enemyShipCharacter enemy
-            | Star _ -> "*"
-            | Player _ -> "p"
-            | EmptySpace _ -> "."
-            | Starbase _ -> "b"
+            | Star _ -> String("*")
+            | Player _ -> String("p")
+            | EmptySpace _ -> String(".")
+            | Starbase _ -> String("b")
     
-    let renderShortRangeScannerToString quadrant =
-        let headerLine = "__" + ((Seq.map (fun i -> sprintf "%d_" i) [0..quadrant.map.[0].Length-1]) |> Seq.fold(+) "") + "\n"
-        let contents = Seq.map (fun rowIndex -> sprintf "%d %s\n" rowIndex ((Seq.map (fun column ->
-            sprintf "%s " (getGameObjectCharacter column))quadrant.map.[rowIndex]) |> Seq.fold(+) "")) [0..quadrant.map.Length-1]
-        
-        (Seq.concat([seq [headerLine]; contents])) |> Seq.fold(+) ""
-
-    let renderInColor scannerString =
-        scannerString |> Seq.iter (fun c ->
-            Console.ForegroundColor <- consoleForegroundColor c
-            Console.BackgroundColor <- consoleBackgroundColor c
-            printf "%c" (if c = '_' then ' ' else c)
-            )
+    let processCell cell =
+        [
+            consoleForegroundColor cell ;
+            getGameObjectCharacter cell ;
+            String (" ")
+        ]
+    let processRow rowIndex =
+        [
+            HeaderColor ;
+            String(sprintf "%d" rowIndex) ;
+            DefaultColor ;
+            String(" ") ;
+            Seq(Seq.concat (Seq.map processCell quadrant.map.[rowIndex])) ;
+            DefaultColor ;
+            NewLine
+        ]
     
-    renderShortRangeScannerToString quadrant |> renderInColor
+    let headerLine =
+        [
+            HeaderColor ;
+            String("  ") ;
+            String (((Seq.map (fun i -> sprintf "%d " i) [0..quadrant.map.[0].Length-1]) |> Seq.fold(+) "")) ;
+            DefaultColor ;
+            NewLine
+        ]
+    
+    Seq.map processRow [0..quadrant.map.[0].Length-1]
+        |> Seq.concat
+        |> Seq.append headerLine
+        |> write
     
 let renderLongRangeScanner game =
     let gameObjects = game.objects
@@ -73,11 +70,11 @@ let renderLongRangeScanner game =
             let cell = quadrantSummaries.[rowIndex].[colIndex]
             [
                 BackgroundColor(match cell.hasPlayer with | true -> ConsoleColor.Blue | false -> ConsoleColor.Black) ;
-                ForegroundColor(match cell.numberOfStars with | 0 -> defaultConsoleColor | _ -> ConsoleColor.DarkYellow) ;
+                ForegroundColor(match cell.numberOfStars with | 0 -> ConsoleColor.Green | _ -> ConsoleColor.DarkYellow) ;
                 String(sprintf " %d " cell.numberOfStars) ;
-                ForegroundColor(match cell.hasStarbase with | true -> ConsoleColor.Blue | false -> defaultConsoleColor) ;
+                ForegroundColor(match cell.hasStarbase with | true -> ConsoleColor.Blue | false -> ConsoleColor.Yellow) ;
                 String(sprintf "%s " (if cell.hasStarbase then "S" else "0")) ;
-                ForegroundColor(match cell.numberOfEnemies with | 0 -> defaultConsoleColor | _ -> ConsoleColor.Red) ;
+                ForegroundColor(match cell.numberOfEnemies with | 0 -> ConsoleColor.Green | _ -> ConsoleColor.Red) ;
                 String(sprintf "%d  " cell.numberOfEnemies)
             ]
         
@@ -87,6 +84,7 @@ let renderLongRangeScanner game =
              DefaultColor ;
              String(" ") ;
              Seq(Seq.map outputCell [0..quadrantSummaries.[rowIndex].Length-1] |> Seq.concat) ;
+             DefaultColor ;
              NewLine
         ]
 
@@ -94,6 +92,7 @@ let renderLongRangeScanner game =
                          HeaderColor ;
                          String("  ") ;
                          String(((Seq.map (fun i -> sprintf "   %d    " i) [0..worldSize.quadrantSize.width-1]) |> Seq.fold(+) "")) ;
+                         DefaultColor ;
                          NewLine
                      ]    
     let consoleOutput = (Seq.map processRow [0..quadrantSummaries.Length-1] |> Seq.concat) |> Seq.append [DefaultColor]
@@ -101,7 +100,6 @@ let renderLongRangeScanner game =
     
 let renderWelcomeMessage () =
     [
-        DefaultColor ;
         Line("Welcome to PaddTrek F#") ;
         Line("The galaxy is under attack and your ship is the last hope against the invaders.") ;
         Line("Press ? at any time to see the list of commands you can give your crew.") ;
@@ -133,12 +131,10 @@ let renderInputComplete () =
     [ NewLine ] |> write
 
 let renderMessage text =
-    Console.ForegroundColor <- defaultConsoleColor
-    printLine text
+    [ Line(text) ] |> write
 
 let renderHelp () =
     [
-        DefaultColor ;
         Line("Q - quit the game") ;
         Line("S - short range scanner") ;
         Line("M x y - move within a sector") ;
@@ -148,8 +144,11 @@ let renderHelp () =
     ] |> write
 
 let renderError message =
-    Console.ForegroundColor <- ConsoleColor.DarkRed
-    printLine message
+    [
+        ForegroundColor(ConsoleColor.DarkRed) ;
+        BackgroundColor(ConsoleColor.Black) ;
+        Line(message)
+    ] |> write
 
 let renderCommand game command =
     match command with

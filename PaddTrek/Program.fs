@@ -12,6 +12,7 @@ let main argv =
     let rec gameLoop gameState =
         let command = acceptInput gameState
         let newGameState = match command with
+                            | ConsoleCommand.Clear -> System.Console.Clear (); gameState
                             | ConsoleCommand.Quit -> { gameState with gameOver = confirmQuit() }
                             | ConsoleCommand.Help -> Rendering.renderHelp() ; gameState;
                             | Command cmd -> CommandPipeline.processGameAction gameState cmd

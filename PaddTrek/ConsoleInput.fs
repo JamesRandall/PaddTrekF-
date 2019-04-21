@@ -5,6 +5,7 @@ type ConsoleCommand =
     | Quit
     | Help
     | Error
+    | Clear
     
 let private createCommand commandString args =
     match commandString with
@@ -15,6 +16,7 @@ let private createCommand commandString args =
         | "E" -> Command(PlayerAction.Action.EnergyLevels)
         | "Q" -> ConsoleCommand.Quit
         | "?" -> ConsoleCommand.Help
+        | "X" -> ConsoleCommand.Clear
         | _ -> ConsoleCommand.Error
 
 let private isValidCoordinateArg (arg:string) (size:Geography.Size) =

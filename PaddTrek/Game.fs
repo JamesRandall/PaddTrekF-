@@ -33,9 +33,3 @@ let isEmptySpace gameWorldObject =
         | EmptySpace _ -> true
         | _ -> false
 
-let movePlayerToSector game coordinates =
-    let processGameObject gameObject =
-        match gameObject with
-            | Player pl -> Player(Player.moveToSector pl coordinates)
-            | other -> other
-    { game with objects = game.objects |> Seq.map processGameObject |> Seq.toList  }

@@ -1,5 +1,4 @@
 ﻿module PaddTrek.CommandPipeline
-open PaddTrek.Game
 
 type PipelineCommand = {
     game: Game.Game
@@ -8,6 +7,15 @@ type PipelineCommand = {
     aiActionRequired: bool
     continueToProcess: bool
 }
+
+let private createPipelineCommand game action =
+    {
+        game = game
+        action = action
+        output = ""
+        aiActionRequired = false
+        continueToProcess = true
+    }
     
 let private continueWith command = command
 
@@ -38,16 +46,7 @@ let private renderCommand command =
     continueWith command
 
 let processGameAction game action =
-    // implies an AI action is required
-    let player = game |> getPlayer
-    let command =
-        {
-            game = game
-            action = action
-            output = ""
-            aiActionRequired = false
-            continueToProcess = true
-        }
+    let command = createPipelineCommand game action
     let commandResult = command |> validateCommand |> executeCommand |> renderCommand |> handleAiActionIfRequired
     commandResult.game
 

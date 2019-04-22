@@ -21,16 +21,15 @@ type WorldSize = {
     sectorSize: Size
 }
 
+let createCoordinate x y = {
+    x = x
+    y = y
+}
+
 let randomGalacticPosition worldSize =
     {
-        quadrant = {
-            x = Random.upto (worldSize.quadrantSize.width - 1)
-            y = Random.upto (worldSize.quadrantSize.height - 1)
-        }
-        sector = {
-            x = Random.upto (worldSize.sectorSize.width - 1)
-            y = Random.upto (worldSize.sectorSize.height - 1)
-        }
+        quadrant = createCoordinate (Random.upto (worldSize.quadrantSize.width - 1)) (Random.upto (worldSize.quadrantSize.height - 1))
+        sector = createCoordinate (Random.upto (worldSize.sectorSize.width - 1)) (Random.upto (worldSize.sectorSize.height - 1))
     }
 
 let nonClashingRandomGalacticPosition (existingCoordinates:ISet<GalacticCoordinate>, worldSize:WorldSize) =
@@ -45,10 +44,7 @@ let nonClashingRandomGalacticPosition (existingCoordinates:ISet<GalacticCoordina
 
 let createCoordinateWithStrings args = 
     let intArgs = args |> Seq.map (fun arg -> System.Int32.Parse(arg)) |> Seq.toArray
-    {
-        x = intArgs.[0]
-        y = intArgs.[1]
-    }
+    createCoordinate intArgs.[0] intArgs.[1]
 
 let createGalacticCoordinate quadrantCoord sectorCoord =
     {
@@ -57,7 +53,8 @@ let createGalacticCoordinate quadrantCoord sectorCoord =
     }
 
 let distanceBetweenCoordinates coord1 coord2 =
-    let width = abs(coord1.x - coord2.x)
-    let height = abs(coord1.y - coord2.y)
+    let width = (max coord1.x coord2.x) - (min coord1.x coord2.x)
+    let height = (max coord1.y coord2.y) - (min coord1.y coord2.y)
+    
     let distance = ceil(sqrt(float(width*width + height*height)))
     int(distance)

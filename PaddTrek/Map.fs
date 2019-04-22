@@ -32,7 +32,7 @@ let createQuadrant gameObjects quadrantCoordinate worldSize =
     let quadrantObjects = Seq.toList (objectsInQuadrant gameObjects quadrantCoordinate)
 
     let createSummaryCell x y =
-        let sectorCoordinate = { x = x; y = y }
+        let sectorCoordinate = createCoordinate x y
         let coordinate = { quadrant = quadrantCoordinate; sector = sectorCoordinate }
         findWithSectorCoordinate quadrantObjects coordinate
 

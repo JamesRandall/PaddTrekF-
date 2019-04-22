@@ -23,19 +23,7 @@ let createEnemy enemyType position maxEnergy maxShields maxHull =
             position = position 
         }
         enemyType = enemyType
-        energy = {
-            min = 0
-            max = maxEnergy
-            value = maxEnergy
-        }
-        shields = {
-            min = 0
-            max = maxShields
-            value = maxShields
-        }
-        hull = {
-            min = 0
-            max = maxHull
-            value = maxHull
-        }
+        energy = Range.createWithMax maxEnergy
+        shields = Range.createWithMax maxShields
+        hull = Range.createWithMax maxHull
     }

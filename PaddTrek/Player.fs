@@ -16,6 +16,8 @@ type PlayerHealth = {
     hull: PlayerSystem
     impulseEngines: PlayerSystem
     warpEngines: PlayerSystem
+    energyConverter: PlayerSystem
+    shieldGenerator: PlayerSystem
 }
 
 type Player = {
@@ -32,17 +34,19 @@ let create position  =
             description = "The player"
             position = position 
         }
-        energy = { min = 0 ; max = 1000 ; value = 1000 }
+        energy = Range.createWithMax 5000
         shields = {
-            fore = { min = 0 ; max = 1000 ; value = 1000 }
-            port = { min = 0 ; max = 1000 ; value = 1000 }
-            aft = { min = 0 ; max = 1000 ; value = 1000 }
-            starboard = { min = 0 ; max = 1000 ; value = 1000 }
+            fore = Range.createWithMax 1500
+            port = Range.createWithMax 1500
+            aft = Range.createWithMax 1500
+            starboard = Range.createWithMax 1500
         }
         health = {
-            hull = { name = "Hull" ; health = { min = 0 ; max = 1000 ; value = 1000 } }
-            impulseEngines = { name = "Impulse Engines" ; health = { min = 0 ; max = 1000 ; value = 1000 } }
-            warpEngines = { name = "Warp Engines" ; health = { min = 0 ; max = 1000 ; value = 1000 } }
+            hull = { name = "Hull" ; health = Range.createWithMax 2000 }
+            impulseEngines = { name = "Impulse Engines" ; health = Range.createWithMax 1000 }
+            warpEngines = { name = "Warp Engines" ; health = Range.createWithMax 1000 }
+            energyConverter = { name = "Energy Converter"; health = Range.createWithMax 750 }
+            shieldGenerator = { name = "Shield Generator"; health = Range.createWithMax 750 }
         }
     }
 

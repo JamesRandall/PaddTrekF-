@@ -1,4 +1,5 @@
 module PaddTrek.ConsoleInput
+open PaddTrek.Geography
 
 type ConsoleCommand =
     | Command of PlayerAction.Action
@@ -24,14 +25,14 @@ let private isValidCoordinateArg (arg:string) (size:Geography.Size) =
         | (true, number) -> number >=0 && number < size.width
         | (false, _)  -> false
         
-let private validateMoveArgs (game:Game.Game) args =
+let private validateMoveArgs (gameSize:WorldSize) args =
     match args |> Seq.length = 2 &&
-          args |> Seq.fold(fun valid arg -> valid && (isValidCoordinateArg arg game.size.sectorSize)) true
+          args |> Seq.fold(fun valid arg -> valid && (isValidCoordinateArg arg gameSize.sectorSize)) true
      with
         | false -> "Invalid move command - it takes the form: m x y"
         | _ -> ""
 
-let acceptInput game =
+let acceptInput gameSize =
         let readInput () =
             Rendering.renderWaitingForInput ()
             let inputLine = System.Console.ReadLine ()
@@ -43,7 +44,7 @@ let acceptInput game =
         Rendering.renderInputComplete ()
         
         let errorMessage = match commandString with
-                            | "M" -> validateMoveArgs game args
+                            | "M" -> validateMoveArgs gameSize args
                             | _ -> ""
                             
         match errorMessage with

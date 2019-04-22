@@ -8,21 +8,30 @@ let main argv =
     let confirmQuit() =
         Rendering.renderMessage "Press y to confirm you want to quit the game"
         System.Console.ReadKey().Key = System.ConsoleKey.Y
-
-    let rec gameLoop gameState =
-        let command = acceptInput gameState
-        let newGameState = match command with
-                            | ConsoleCommand.Clear -> System.Console.Clear (); gameState
-                            | ConsoleCommand.Quit -> { gameState with gameOver = confirmQuit() }
-                            | ConsoleCommand.Help -> Rendering.renderHelp() ; gameState;
-                            | Command cmd -> CommandPipeline.processGameAction gameState cmd
-                            | _ -> gameState
-                            
-        match newGameState.gameOver with
-            | true -> gameState
-            | false -> gameLoop newGameState
-
+        
+    let playerHasNotQuit command = not(command = ConsoleCommand.Quit && confirmQuit())
+    
+    let processCommand gameState command =
+        match command with
+            | ConsoleCommand.Clear -> System.Console.Clear (); gameState
+            | ConsoleCommand.Help -> Rendering.renderHelp() ; gameState
+            | Command cmd -> CommandPipeline.processGameAction gameState cmd
+            | _ -> gameState
+    
     let newGame = createGame
+    let gameSize = newGame.size
     Rendering.renderWelcomeMessage ()
-    Rendering.renderShortRangeScanner newGame
-    (gameLoop newGame).score
+    Rendering.renderShortRangeScanner newGame 
+    
+    let commands = seq {
+        while true do
+            let command = acceptInput gameSize
+            yield command
+    }
+    
+    let completedGame =
+        commands
+        |> Seq.takeWhile playerHasNotQuit
+        |> Seq.fold processCommand newGame
+
+    completedGame.score

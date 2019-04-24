@@ -8,18 +8,20 @@ type EmptySpace = {
     attributes: Models.GameWorldObjectAttributes
 }
 
-let createEmpty position : EmptySpace =
+let createEmpty position id : EmptySpace =
     {
         attributes = {
+            id = id
             name = "Empty space"
             description = "Nothing much to see here!"
             position = position
         }
     }
 
-let createStar position : Star =
+let createStar position id : Star =
     {
          attributes = {
+            id = id
             name = "Star"
             description = "Star"
             position = position   

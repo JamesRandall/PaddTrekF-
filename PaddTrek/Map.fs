@@ -19,7 +19,8 @@ let findWithSectorCoordinate gameObjects sectorCoordinate =
         (Game.getAttributes gameObject).position = sectorCoordinate
     
     let result = Seq.tryFind isAtCoordinate gameObjects
-    Option.defaultValue (Game.EmptySpace(Space.createEmpty sectorCoordinate)) result
+    // TODO: Think about IDs some more
+    Option.defaultValue (Game.EmptySpace(Space.createEmpty sectorCoordinate -1)) result
 
 let objectsInQuadrant gameObjects quadrantCoordinate  =
     let isInQuadrant gameObject =

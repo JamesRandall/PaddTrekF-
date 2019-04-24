@@ -5,6 +5,7 @@ type PlayerShields = {
     port: Range.Range
     aft: Range.Range
     starboard: Range.Range
+    raised: bool
 }
 
 type PlayerSystem = {
@@ -27,9 +28,10 @@ type Player = {
     health: PlayerHealth
 }
 
-let create position  = 
+let create position id  = 
     {
         attributes = {
+            id = id
             name = "Player"
             description = "The player"
             position = position 
@@ -40,6 +42,7 @@ let create position  =
             port = Range.createWithMax 1500
             aft = Range.createWithMax 1500
             starboard = Range.createWithMax 1500
+            raised = true
         }
         health = {
             hull = { name = "Hull" ; health = Range.createWithMax 2000 }
@@ -62,3 +65,22 @@ let moveToSector player coordinates =
             energy = { player.energy with value = player.energy.value - (energyToMovePlayerToSector player coordinates) }
     }
 
+let hitByEnergyWeapon energy player =
+    // temporarily to test this we're just hitting the fore shield, will worry about angle
+    // and systems later!
+    
+    let newForeShield, actualNewForeShieldAdjustment = player.shields.fore |> Range.decrement energy 
+    let newPortShield = player.shields.port
+    let newAftShield = player.shields.aft
+    let newStarboardShield = player.shields.starboard
+    
+    {
+        player with
+            shields = {
+                    fore = newForeShield
+                    port = newPortShield
+                    aft = newAftShield
+                    starboard = newStarboardShield
+                    raised = player.shields.raised
+                }
+    }

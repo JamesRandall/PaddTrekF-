@@ -13,16 +13,14 @@ let createGame =
         ignore(existingCoordinates.Add (createdPosition))
         createdPosition
     
-    let createEnemyScout () = Enemies.createEnemy Enemies.EnemyType.Scout (newPosition()) 1000 1000 1000
-    let createEnemyCruiser () = Enemies.createEnemy Enemies.EnemyType.Cruiser (newPosition()) 2000 1500 1500
-    let createEnemyDreadnought () = Enemies.createEnemy Enemies.EnemyType.Cruiser (newPosition()) 3000 2500 2500
+    Space.createStar (newPosition ()) 20
     
-    let stars = Seq.map (fun _ -> Star(Space.createStar(newPosition()))) [0..150]
-    let enemyScouts = Seq.map (fun _ -> EnemyShip(createEnemyScout())) [0..50]
-    let enemyCruisers = Seq.map (fun _ -> EnemyShip(createEnemyCruiser())) [0..30]
-    let enemyDreadnoughts = Seq.map (fun _ -> EnemyShip(createEnemyDreadnought())) [0..10]
+    let stars = Seq.map (fun i -> Star(Space.createStar (newPosition ()) i)) [0..149]
+    let enemyScouts = Seq.map (fun i -> EnemyShip(Enemies.createEnemyScout (newPosition ()) (i))) [150..199]
+    let enemyCruisers = Seq.map (fun i -> EnemyShip(Enemies.createEnemyCruiser (newPosition ()) i)) [200..229]
+    let enemyDreadnoughts = Seq.map (fun i -> EnemyShip(Enemies.createEnemyDreadnought (newPosition()) i)) [230..239]
 
-    let player = Player.create (newPosition())
+    let player = Player.create (newPosition()) 240
         
     {
         size = worldSize

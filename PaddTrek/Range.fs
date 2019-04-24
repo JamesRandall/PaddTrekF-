@@ -26,3 +26,8 @@ let createWithMax max =
         max = max
         value = max
     }
+    
+let decrement byAmount range =
+    let delta = min byAmount range.value
+    let updatedRange = { range with value = (range.value-delta) }
+    (updatedRange, delta)

@@ -4,7 +4,7 @@ open PaddTrek.GameBuilder
 open PaddTrek.ConsoleInput
 
 [<EntryPoint>]
-let main argv =
+let main _ =
     let confirmQuit() =
         Rendering.renderMessage "Press y to confirm you want to quit the game"
         System.Console.ReadKey().Key = System.ConsoleKey.Y

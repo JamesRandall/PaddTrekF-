@@ -8,7 +8,7 @@ let private enemyTurn game (enemy:EnemyShip) =
     
     game |> Game.updateWithObjects [
         Game.EnemyShip(enemy |> Enemies.spendEnergy phaserPower) ;
-        Game.Player(player |> Player.hitByEnergyWeapon phaserPower)
+        Game.Player(player |> Player.hitByEnergyWeapon phaserPower enemy.attributes.position.sector)
     ] 
  
 

@@ -8,18 +8,30 @@ type PlayerShields = {
     raised: bool
 }
 
+type PlayerSystemId =
+    | Hull = 0
+    | ImpulseEngines = 1 
+    | WarpEngines = 2
+    | EnergyConvertor = 3
+    | ShieldGenerator = 4
+    | LifeSupport = 5
+    | Max = 5
+
 type PlayerSystem = {
     name: string
     health: Range.Range
 }
 
 type PlayerHealth = {
-    hull: PlayerSystem
-    impulseEngines: PlayerSystem
-    warpEngines: PlayerSystem
-    energyConverter: PlayerSystem
-    shieldGenerator: PlayerSystem
-}
+    systems: Map<PlayerSystemId, PlayerSystem> 
+} with
+    member this.Hull = this.systems.Item PlayerSystemId.Hull
+    member this.ImpulseEngines = this.systems.Item PlayerSystemId.ImpulseEngines
+    member this.WarpEngines = this.systems.Item PlayerSystemId.WarpEngines
+    member this.EnergyConvertor = this.systems.Item PlayerSystemId.EnergyConvertor
+    member this.ShieldGenerator = this.systems.Item PlayerSystemId.ShieldGenerator
+    member this.LifeSupport = this.systems.Item PlayerSystemId.LifeSupport
+    
 
 type Player = {
     attributes: Models.GameWorldObjectAttributes
@@ -27,6 +39,9 @@ type Player = {
     shields: PlayerShields
     health: PlayerHealth
 }
+
+let createPlayerSystem name maxHealth =
+    { name = name ; health = Range.createWithMax maxHealth }
 
 let create position id  = 
     {
@@ -45,12 +60,15 @@ let create position id  =
             raised = true
         }
         health = {
-            hull = { name = "Hull" ; health = Range.createWithMax 2000 }
-            impulseEngines = { name = "Impulse Engines" ; health = Range.createWithMax 1000 }
-            warpEngines = { name = "Warp Engines" ; health = Range.createWithMax 1000 }
-            energyConverter = { name = "Energy Converter"; health = Range.createWithMax 750 }
-            shieldGenerator = { name = "Shield Generator"; health = Range.createWithMax 750 }
-        }
+            systems = Map [
+                    (PlayerSystemId.Hull, createPlayerSystem "Hull" 2000)
+                    (PlayerSystemId.ImpulseEngines, createPlayerSystem "Impulse Engines" 1000)
+                    (PlayerSystemId.WarpEngines, createPlayerSystem "Warp Engines" 1000)
+                    (PlayerSystemId.EnergyConvertor, createPlayerSystem "Energy Converter" 750)
+                    (PlayerSystemId.ShieldGenerator, createPlayerSystem "Shield Generator" 750)
+                    (PlayerSystemId.LifeSupport, createPlayerSystem "Life Support" 750)
+                ]
+            }            
     }
 
 let energyToMovePlayerToSector player coordinates =
@@ -65,16 +83,32 @@ let moveToSector player coordinates =
             energy = { player.energy with value = player.energy.value - (energyToMovePlayerToSector player coordinates) }
     }
 
-let hitByEnergyWeapon energy player =
+let hitByEnergyWeapon energy fromCoordinates player =
+    let foreEnergyHit () =
+        energy
+    let portEnergyHit () =
+        0
+    let aftEnergyHit () =
+        0
+    let starboardEnergyHit () =
+        0
+     
     // temporarily to test this we're just hitting the fore shield, will worry about angle
     // and systems later!
     
-    let newForeShield, actualNewForeShieldAdjustment = player.shields.fore |> Range.decrement energy 
-    let newPortShield = player.shields.port
-    let newAftShield = player.shields.aft
-    let newStarboardShield = player.shields.starboard
+    let newForeShield, actualForeShieldAdjustment = player.shields.fore |> Range.decrement (foreEnergyHit ()) 
+    let newPortShield, actualPortShieldAdjustment = player.shields.port |> Range.decrement (portEnergyHit ())
+    let newAftShield, actualAftShieldAdjustment = player.shields.aft |> Range.decrement (aftEnergyHit ())    
+    let newStarboardShield, actualStarboardShieldAdjustment = player.shields.starboard |> Range.decrement (starboardEnergyHit ())
     
-    {
+    let totalEnergyAdjusment = actualForeShieldAdjustment +
+                               actualPortShieldAdjustment +
+                               actualAftShieldAdjustment +
+                               actualStarboardShieldAdjustment
+                               
+    let remainingEnergyAfterShields = energy - totalEnergyAdjusment
+    
+    let playerWithShieldsUpdated = {
         player with
             shields = {
                     fore = newForeShield
@@ -84,3 +118,20 @@ let hitByEnergyWeapon energy player =
                     raised = player.shields.raised
                 }
     }
+    
+    let calculateHitOnPlayerSystem (remainingEnergy, previousPlayer) (KeyValue(systemId, system:PlayerSystem)) =
+        if remainingEnergy = 0 || system.health.value = 0 then
+            (remainingEnergy, previousPlayer)
+        else
+            let newEnergy = remainingEnergy - (min remainingEnergy system.health.value)
+            let delta = remainingEnergy - newEnergy
+            let updatedSystem = { system with health = { system.health with value = system.health.value - delta } }
+            let newSystems = previousPlayer.health.systems |> Map.remove systemId |> Map.add systemId updatedSystem 
+            let updatedPlayer = { previousPlayer with health = { previousPlayer.health with systems = newSystems } }
+            (newEnergy, updatedPlayer)
+        
+    let randomSystems = player.health.systems |> Seq.sortBy (fun _ -> Random.any)
+    let startingState = (remainingEnergyAfterShields, playerWithShieldsUpdated)
+    let _, updatedPlayer = randomSystems |> Seq.fold calculateHitOnPlayerSystem startingState 
+    
+    updatedPlayer    

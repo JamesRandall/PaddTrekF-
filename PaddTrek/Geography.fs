@@ -58,3 +58,18 @@ let distanceBetweenCoordinates coord1 coord2 =
     
     let distance = ceil(sqrt(float(width*width + height*height)))
     int(distance)
+
+ 
+let angleBetweenTwoPoints firstPoint secondPoint =
+    let xDiff = float(secondPoint.x - firstPoint.x)
+    let yDiff = float(firstPoint.y - secondPoint.y)
+    // if firstPoint is the "center" around which the angle revolves then this will
+    // give us angles of 0 to 180 from 12 o'clock to 6 o'clock (clockwise) and from
+    // > -180 to < 0 from 6 o'clock (just after) round to 12 o'clock (just before)
+    let angle = (atan2 xDiff yDiff) * 180.0 / System.Math.PI
+    // this moves it to 0 to 360 clockwise from 12 o'clock
+    if angle < 0.0 then
+        angle + 360.0
+    else
+        angle
+    

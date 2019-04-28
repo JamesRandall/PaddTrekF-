@@ -25,8 +25,10 @@ let private stopWith message command = { command with continueToProcess = false 
 
 let private handleAiActionIfRequired command =
         match command.aiActionRequired with
-            | true -> 
-                { command with game = Ai.turn command.game }
+            | true ->
+                let updatedGame, aiMessages = Ai.turn command.game
+                aiMessages |> Rendering.renderMessages
+                { command with game = updatedGame }
             | _ -> continueWith command
             
 let private validateCommand command =

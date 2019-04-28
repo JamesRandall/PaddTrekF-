@@ -1,4 +1,5 @@
 ﻿module PaddTrek.Game
+open PaddTrek.Geography
 
 type GameWorldObject =
     | EnemyShip of Enemies.EnemyShip
@@ -12,6 +13,7 @@ type GameWorldObject =
 
 type Game = {
     size: Geography.WorldSize
+    discoveredQuadrants: Coordinate list
     objects: GameWorldObject list
     score: int
     gameOver: bool

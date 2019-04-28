@@ -1,4 +1,5 @@
 ﻿module PaddTrek.Player
+open PaddTrek.Message
 
 type PlayerShields = {
     fore: Range.Range
@@ -96,12 +97,12 @@ let hitByEnergyWeapon energy fromCoordinates player =
     let newForeShield, actualForeShieldAdjustment = player.shields.fore |> Range.decrement (foreEnergyHit ()) 
     let newPortShield, actualPortShieldAdjustment = player.shields.port |> Range.decrement (portEnergyHit ())
     let newAftShield, actualAftShieldAdjustment = player.shields.aft |> Range.decrement (aftEnergyHit ())    
-    let newStarboardShield, actualStarboardShieldAdjustment = player.shields.starboard |> Range.decrement (starboardEnergyHit ())
-    
+    let newStarboardShield, actualStarboardShieldAdjustment = player.shields.starboard |> Range.decrement (starboardEnergyHit ())    
+        
     let totalEnergyAdjusment = actualForeShieldAdjustment +
                                actualPortShieldAdjustment +
                                actualAftShieldAdjustment +
-                               actualStarboardShieldAdjustment
+                               actualStarboardShieldAdjustment                               
                                
     let remainingEnergyAfterShields = energy - totalEnergyAdjusment
     
@@ -116,19 +117,34 @@ let hitByEnergyWeapon energy fromCoordinates player =
                 }
     }
     
-    let calculateHitOnPlayerSystem (remainingEnergy, previousPlayer) (KeyValue(systemId, system:PlayerSystem)) =
+    let messages =
+        if actualForeShieldAdjustment > 0 then
+            [{text = (sprintf "Fore shield hit with %d energy and reduced to %d" actualForeShieldAdjustment newForeShield.value) ;
+              kind=messageKindForRange newForeShield }]
+        elif actualAftShieldAdjustment > 0 then
+            [{text = (sprintf "Aft shield hit with %d energy and reduced to %d" actualAftShieldAdjustment newAftShield.value) ;
+              kind=messageKindForRange newAftShield}]
+        elif actualPortShieldAdjustment > 0 then
+            [{text = (sprintf "Port shield hit with %d energy and reduced to %d" actualPortShieldAdjustment newPortShield.value) ;
+              kind=messageKindForRange newPortShield}]
+        elif actualStarboardShieldAdjustment > 0 then
+            [{text = (sprintf "Starboard shield hit with %d energy and reduced to %d" actualForeShieldAdjustment newStarboardShield.value) ;
+              kind=messageKindForRange newStarboardShield}]
+        else []
+    
+    let calculateHitOnPlayerSystem (remainingEnergy, previousPlayer, previousMessages) (KeyValue(systemId, system:PlayerSystem)) =
         if remainingEnergy = 0 || system.health.value = 0 then
-            (remainingEnergy, previousPlayer)
+            (remainingEnergy, previousPlayer, previousMessages)
         else
             let newEnergy = remainingEnergy - (min remainingEnergy system.health.value)
             let delta = remainingEnergy - newEnergy
             let updatedSystem = { system with health = { system.health with value = system.health.value - delta } }
             let newSystems = previousPlayer.health.systems |> Map.remove systemId |> Map.add systemId updatedSystem 
             let updatedPlayer = { previousPlayer with health = { previousPlayer.health with systems = newSystems } }
-            (newEnergy, updatedPlayer)
+            (newEnergy, updatedPlayer, previousMessages)
         
     let randomSystems = player.health.systems |> Seq.sortBy (fun _ -> Random.any)
-    let startingState = (remainingEnergyAfterShields, playerWithShieldsUpdated)
-    let _, updatedPlayer = randomSystems |> Seq.fold calculateHitOnPlayerSystem startingState 
+    let startingState = (remainingEnergyAfterShields, playerWithShieldsUpdated, messages)
+    let _, updatedPlayer, messages = randomSystems |> Seq.fold calculateHitOnPlayerSystem startingState 
     
-    updatedPlayer    
+    updatedPlayer, messages

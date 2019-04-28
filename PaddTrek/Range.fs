@@ -31,3 +31,7 @@ let decrement byAmount range =
     let delta = min byAmount range.value
     let updatedRange = { range with value = (range.value-delta) }
     (updatedRange, delta)
+    
+let percentage range =
+    100 * range.value / range.max
+    

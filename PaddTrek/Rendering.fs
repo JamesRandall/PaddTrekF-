@@ -5,6 +5,7 @@ open PaddTrek.Enemies
 open PaddTrek.Map
 open PaddTrek.Game
 open ConsoleOutput
+open PaddTrek.Message
     
 let renderShortRangeScanner game =
     let quadrant = Map.createCurrentQuadrant game
@@ -119,9 +120,9 @@ let renderEnergyLevels game =
     [
         ("Main energy", player.energy)
         ("Fore shields", player.shields.fore)
-        ("Port shields", player.shields.port)
-        ("Aft shields", player.shields.aft)
         ("Starboard shields", player.shields.starboard)
+        ("Aft shields", player.shields.aft)
+        ("Port shields", player.shields.port)
     ] |> Seq.map renderRange |> Seq.concat |> write
     
 let renderWaitingForInput () =
@@ -156,3 +157,16 @@ let renderCommand game command =
     | PlayerAction.LongRangeScanner -> renderLongRangeScanner game
     | PlayerAction.MoveSector coords -> renderShortRangeScanner game ; printf "Moved to position %d,%d" coords.x coords.y
     | PlayerAction.EnergyLevels -> renderEnergyLevels game
+
+let renderMessages messages =
+    let createRenderOutputFromMessage message =
+        [
+            (match message.kind with
+                | MessageKind.Danger -> ForegroundColor(ConsoleColor.Red)
+                | MessageKind.Warning -> ForegroundColor(ConsoleColor.Yellow)
+                | _ -> ForegroundColor(ConsoleColor.Green)) ;
+            Line(message.text)
+        ]
+    
+    let output = messages |> Seq.map createRenderOutputFromMessage |> Seq.concat
+    output |> write

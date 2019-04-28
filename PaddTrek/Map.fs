@@ -12,6 +12,7 @@ type QuadrantSummary = {
     numberOfStars: int
     hasStarbase: bool
     hasPlayer: bool
+    isDiscovered: bool
 }
 
 let findWithSectorCoordinate gameObjects sectorCoordinate =
@@ -57,6 +58,7 @@ let private summarise gameObjects =
         numberOfStars = gameObjects |> Seq.sumBy (function | Game.Star _ -> 1 | _ -> 0)
         hasStarbase = gameObjects |> Seq.exists (function | Game.Starbase _ -> true | _ -> false)
         hasPlayer = gameObjects |> Seq.exists (function | Game.Player _ -> true | _ -> false)
+        isDiscovered = true
     }
     
 let createQuadrantSummary game coords =

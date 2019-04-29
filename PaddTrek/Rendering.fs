@@ -63,21 +63,25 @@ let renderShortRangeScanner game =
         |> write
     
 let renderLongRangeScanner game =
-    let gameObjects = game.objects
     let worldSize = game.size
-    let quadrantSummaries = createQuadrantSummaries gameObjects worldSize
+    let quadrantSummaries = createQuadrantSummaries game
     let processRow rowIndex =
         let outputCell colIndex =
             let cell = quadrantSummaries.[rowIndex].[colIndex]
-            [
-                BackgroundColor(match cell.hasPlayer with | true -> ConsoleColor.Blue | false -> ConsoleColor.Black) ;
-                ForegroundColor(match cell.numberOfStars with | 0 -> ConsoleColor.Green | _ -> ConsoleColor.DarkYellow) ;
-                String(sprintf " %d " cell.numberOfStars) ;
-                ForegroundColor(match cell.hasStarbase with | true -> ConsoleColor.Blue | false -> ConsoleColor.Yellow) ;
-                String(sprintf "%s " (if cell.hasStarbase then "S" else "0")) ;
-                ForegroundColor(match cell.numberOfEnemies with | 0 -> ConsoleColor.Green | _ -> ConsoleColor.Red) ;
-                String(sprintf "%d  " cell.numberOfEnemies)
-            ]
+            match cell.isDiscovered with
+                | true -> [
+                    BackgroundColor(match cell.hasPlayer with | true -> ConsoleColor.Blue | false -> ConsoleColor.Black) ;
+                    ForegroundColor(match cell.numberOfStars with | 0 -> ConsoleColor.Green | _ -> ConsoleColor.DarkYellow) ;
+                    String(sprintf " %d " cell.numberOfStars) ;
+                    ForegroundColor(match cell.hasStarbase with | true -> ConsoleColor.Blue | false -> ConsoleColor.Yellow) ;
+                    String(sprintf "%s " (if cell.hasStarbase then "S" else "0")) ;
+                    ForegroundColor(match cell.numberOfEnemies with | 0 -> ConsoleColor.Green | _ -> ConsoleColor.Red) ;
+                    String(sprintf "%d  " cell.numberOfEnemies)]
+                | false -> [
+                    BackgroundColor(ConsoleColor.Black) ;
+                    ForegroundColor(ConsoleColor.DarkGreen) ;
+                    String(" ? ? ?  ")
+                ]
         
         [
              HeaderColor ;

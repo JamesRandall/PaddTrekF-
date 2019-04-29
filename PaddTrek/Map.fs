@@ -52,27 +52,29 @@ let createQuadrant gameObjects quadrantCoordinate worldSize =
 let createCurrentQuadrant (game:Game.Game) =
     createQuadrant game.objects (Game.getPlayer game).attributes.position.quadrant game.size
 
-let private summarise gameObjects =
+let private summarise gameObjects isDiscovered =
     {
         numberOfEnemies = gameObjects |> Seq.sumBy (function | Game.EnemyShip _ -> 1 | _ -> 0)
         numberOfStars = gameObjects |> Seq.sumBy (function | Game.Star _ -> 1 | _ -> 0)
         hasStarbase = gameObjects |> Seq.exists (function | Game.Starbase _ -> true | _ -> false)
         hasPlayer = gameObjects |> Seq.exists (function | Game.Player _ -> true | _ -> false)
-        isDiscovered = true
+        isDiscovered = isDiscovered
     }
     
 let createQuadrantSummary game coords =
     let objectsInQuadrant = objectsInQuadrant game.objects coords
     summarise objectsInQuadrant
 
-let createQuadrantSummaries gameObjects worldSize =
-    let objectsInQuadrantForGameObjects = objectsInQuadrant gameObjects
+let createQuadrantSummaries (game:Game.Game) =
+    let objectsInQuadrantForGameObjects = objectsInQuadrant game.objects
 
     let createSummaryRow y =
-        Seq.toArray (Seq.map (fun x -> summarise (objectsInQuadrantForGameObjects { x=x; y=y}) ) [0..worldSize.quadrantSize.width-1])
+        let createSummaryCell x =
+            summarise (objectsInQuadrantForGameObjects { x=x; y=y}) (game.discoveredQuadrants |> Seq.contains {x =x;y=y}) 
+        Seq.map createSummaryCell [0..game.size.quadrantSize.width-1] |> Seq.toArray
 
     let galaxyArray = Seq.toArray (
-                        Seq.map createSummaryRow [0..worldSize.quadrantSize.height-1])
+                        Seq.map createSummaryRow [0..game.size.quadrantSize.height-1])
     
     galaxyArray
 

@@ -19,7 +19,7 @@ let private createPipelineCommand game action =
     
 let private continueWith command = command
 
-let private continueWithNewGameState command newGameState = { command with aiActionRequired = true; game = newGameState }
+let private continueWithNewGameState command (newGameState, aiActionRequired) = { command with aiActionRequired = aiActionRequired; game = newGameState }
     
 let private stopWith message command = { command with continueToProcess = false ; output = message }
 

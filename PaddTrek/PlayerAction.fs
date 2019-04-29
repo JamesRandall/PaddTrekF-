@@ -46,5 +46,5 @@ let execute game action =
     let player = Game.getPlayer game
     
     match action with
-        | MoveSector coords -> replacePlayer (Player.moveToSector player coords)
-        | _ -> game
+        | MoveSector coords -> (replacePlayer (Player.moveToSector player coords), true)
+        | _ -> (game, false)

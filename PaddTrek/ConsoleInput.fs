@@ -11,7 +11,7 @@ type ConsoleCommand =
 let private createCommand commandString args =
     match commandString with
         | "M" -> Command(PlayerAction.Action.MoveSector(Geography.createCoordinateWithStrings args))
-        | "G" -> Command(PlayerAction.Action.MoveQuadrant)
+        | "G" -> Command(PlayerAction.Action.MoveQuadrant(Geography.createCoordinateWithStrings args, int((args |> Seq.toArray).[2])))
         | "S" -> Command(PlayerAction.Action.ShortRangeScanner)
         | "L" -> Command(PlayerAction.Action.LongRangeScanner)
         | "E" -> Command(PlayerAction.Action.EnergyLevels)
@@ -25,12 +25,24 @@ let private isValidCoordinateArg (arg:string) (size:Geography.Size) =
         | (true, number) -> number >=0 && number < size.width
         | (false, _)  -> false
         
+let private isNumber (arg:string) =
+    fst (System.Int32.TryParse arg)    
+       
 let private validateMoveArgs (gameSize:WorldSize) args =
     match args |> Seq.length = 2 &&
           args |> Seq.fold(fun valid arg -> valid && (isValidCoordinateArg arg gameSize.sectorSize)) true
      with
-        | false -> "Invalid move command - it takes the form: m x y"
+        | false -> "Invalid short range move command - it takes the form: M x y"
         | _ -> ""
+        
+let private validateMoveQuadrantArgs (gameSize:WorldSize) args =
+    match args |> Seq.length = 3 &&
+          args |> Seq.take(2) |> Seq.fold(fun valid arg -> valid && (isValidCoordinateArg arg gameSize.quadrantSize)) true
+     with
+        | false -> "Invalid long range move command - it takes the form: G x y w"
+        | true -> match (args |> Seq.skip(2) |> Seq.toArray).[0] |> isNumber
+                   with | false -> "Warp speed must be a number" | true -> ""
+                    
 
 let acceptInput gameSize =
         let readInput () =
@@ -45,6 +57,7 @@ let acceptInput gameSize =
         
         let errorMessage = match commandString with
                             | "M" -> validateMoveArgs gameSize args
+                            | "G" -> validateMoveQuadrantArgs gameSize args
                             | _ -> ""
                             
         match errorMessage with

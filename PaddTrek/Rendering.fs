@@ -142,7 +142,8 @@ let renderHelp () =
     [
         Line("Q - quit the game") ;
         Line("S - short range scanner") ;
-        Line("M x y - move within a sector") ;
+        Line("M x y - move within a sector (short range)") ;
+        Line("G x y - move within the galaxy (long range)")
         Line("E - show energy levels") ;
         Line("U - shields up") ;
         Line("D - shields down")
@@ -157,7 +158,7 @@ let renderError message =
 
 let renderCommand game command =
     match command with
-    | PlayerAction.ShortRangeScanner | PlayerAction.MoveQuadrant -> renderShortRangeScanner game
+    | PlayerAction.ShortRangeScanner | PlayerAction.MoveQuadrant(_,_) -> renderShortRangeScanner game
     | PlayerAction.LongRangeScanner -> renderLongRangeScanner game
     | PlayerAction.MoveSector coords -> renderShortRangeScanner game ; printf "Moved to position %d,%d" coords.x coords.y
     | PlayerAction.EnergyLevels -> renderEnergyLevels game

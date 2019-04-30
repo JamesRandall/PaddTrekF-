@@ -4,7 +4,7 @@ open PaddTrek.Game
 
 type Action =
     | MoveSector of Geography.Coordinate
-    | MoveQuadrant
+    | MoveQuadrant of Geography.Coordinate * int
     | ShortRangeScanner
     | LongRangeScanner
     | EnergyLevels
@@ -35,9 +35,16 @@ let validate game action =
             | true -> match player.energy.value >= Player.energyToMovePlayerToSector player coords with
                         | false -> fail "Insufficient energy to move there"
                         | true -> success
+                        
+    let validateMoveQuadrant (coords,warpSpeed) =
+        let player = Game.getPlayer game
+        match player.energy.value >= Player.energyToMovePlayerToQuadrant player coords warpSpeed with
+            | false -> fail "Insufficient energy to move there"
+            | true -> success
     
     match action with
         | MoveSector coords -> coords |> validateMoveSector
+        | MoveQuadrant (moveQuadrant,warpSpeed) -> validateMoveQuadrant (moveQuadrant,warpSpeed) 
         | _ -> success
 
 let execute game action =
@@ -47,4 +54,5 @@ let execute game action =
     
     match action with
         | MoveSector coords -> (replacePlayer (Player.moveToSector player coords), true)
+        | MoveQuadrant (coords,warpSpeed) -> (replacePlayer (Player.moveToQuadrant player coords warpSpeed), true)
         | _ -> (game, false)

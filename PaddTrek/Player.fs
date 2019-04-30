@@ -76,12 +76,26 @@ let energyToMovePlayerToSector player coordinates =
     let energyConsumption = 10
     let distance = Geography.distanceBetweenCoordinates coordinates player.attributes.position.sector
     distance * energyConsumption
+    
+let energyToMovePlayerToQuadrant player coordinates warpSpeed =
+    let energyConsumption = 10
+    let distance = Geography.distanceBetweenCoordinates coordinates player.attributes.position.sector
+    distance * energyConsumption
 
 let moveToSector player coordinates =
     {
         player with
             attributes = { player.attributes with position = { player.attributes.position with sector = coordinates}}
             energy = { player.energy with value = player.energy.value - (energyToMovePlayerToSector player coordinates) }
+    }
+    
+let moveToQuadrant player coordinates warpSpeed =
+    // TODO: make sure we don't end up in a clashing position within a sector, if we're going to move the player out
+    // of the way
+    {
+        player with
+            attributes = { player.attributes with position = { player.attributes.position with quadrant = coordinates}}
+            energy = { player.energy with value = player.energy.value - (energyToMovePlayerToQuadrant player coordinates warpSpeed) }
     }
 
 let hitByEnergyWeapon energy fromCoordinates player =

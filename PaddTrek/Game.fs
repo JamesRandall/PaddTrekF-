@@ -50,3 +50,14 @@ let updateWithObjects updatedGameObjects game =
         
     let updatedGame = { game with objects = game.objects |> Seq.map updateOrKeep |> Seq.toList }
     updatedGame
+    
+let updateDiscoveredQuadrants game =
+    let notAlreadyDiscovered coord =
+        not (game.discoveredQuadrants |> Seq.contains coord)
+    let quadrantsAroundPlayer = game |> getPlayer |> Player.quadrantsAroundPlayer game.size
+    {
+        game with discoveredQuadrants = quadrantsAroundPlayer
+                                            |> Seq.filter notAlreadyDiscovered
+                                            |> Seq.append game.discoveredQuadrants
+                                            |> Seq.toList
+    }

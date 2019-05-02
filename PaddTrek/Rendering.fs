@@ -78,7 +78,7 @@ let renderLongRangeScanner game =
                     ForegroundColor(match cell.numberOfEnemies with | 0 -> ConsoleColor.Green | _ -> ConsoleColor.Red) ;
                     String(sprintf "%d  " cell.numberOfEnemies)]
                 | false -> [
-                    BackgroundColor(ConsoleColor.Black) ;
+                    BackgroundColor(match cell.hasPlayer with | true -> ConsoleColor.Blue | false -> ConsoleColor.Black) ;
                     ForegroundColor(ConsoleColor.DarkGreen) ;
                     String(" ? ? ?  ")
                 ]

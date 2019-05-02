@@ -54,5 +54,6 @@ let execute game action =
     
     match action with
         | MoveSector coords -> (replacePlayer (Player.moveToSector player coords), true)
-        | MoveQuadrant (coords,warpSpeed) -> (replacePlayer (Player.moveToQuadrant player coords warpSpeed), true)
+        | MoveQuadrant (coords,warpSpeed) -> ((replacePlayer (Player.moveToQuadrant player coords warpSpeed)
+                                              |> Game.updateDiscoveredQuadrants), true)
         | _ -> (game, false)

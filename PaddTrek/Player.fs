@@ -162,3 +162,11 @@ let hitByEnergyWeapon energy fromCoordinates player =
     let _, updatedPlayer, messages = randomSystems |> Seq.fold calculateHitOnPlayerSystem startingState 
     
     updatedPlayer, messages
+
+let quadrantsAroundPlayer (worldSize:Geography.WorldSize) player = seq {
+        let quadrantPosition = player.attributes.position.quadrant
+        for y in (max (quadrantPosition.y-1) 0) .. (min (quadrantPosition.y+1) (worldSize.quadrantSize.height-1)) do
+            for x in (max (quadrantPosition.x-1) 0) .. (min (quadrantPosition.x+1) (worldSize.quadrantSize.width-1)) do
+                let coord:Geography.Coordinate = { x = x ; y = y }
+                yield coord
+    }

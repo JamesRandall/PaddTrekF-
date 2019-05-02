@@ -10,7 +10,9 @@ type ConsoleCommand =
     
 let private createCommand commandString args =
     match commandString with
-        | "M" -> Command(PlayerAction.Action.MoveSector(Geography.createCoordinateWithStrings args))
+        | "M" -> match args |> Seq.length with
+                    | 2 -> Command(PlayerAction.Action.MoveSector(Geography.createCoordinateWithStrings args))
+                    | _ -> Command(PlayerAction.Action.MoveQuadrant(Geography.createCoordinateWithStrings args, int((args |> Seq.toArray).[2])))
         | "G" -> Command(PlayerAction.Action.MoveQuadrant(Geography.createCoordinateWithStrings args, int((args |> Seq.toArray).[2])))
         | "S" -> Command(PlayerAction.Action.ShortRangeScanner)
         | "L" -> Command(PlayerAction.Action.LongRangeScanner)
@@ -29,11 +31,20 @@ let private isNumber (arg:string) =
     fst (System.Int32.TryParse arg)    
        
 let private validateMoveArgs (gameSize:WorldSize) args =
-    match args |> Seq.length = 2 &&
-          args |> Seq.fold(fun valid arg -> valid && (isValidCoordinateArg arg gameSize.sectorSize)) true
-     with
-        | false -> "Invalid short range move command - it takes the form: M x y"
-        | _ -> ""
+    let argLength = args |> Seq.length
+    if argLength = 2 then    
+        match args |> Seq.fold(fun valid arg -> valid && (isValidCoordinateArg arg gameSize.sectorSize)) true
+         with
+            | false -> "Invalid short range move command - it takes the form: M x y"
+            | _ -> ""
+    elif argLength = 3 then
+        match args |> Seq.take(2) |> Seq.fold(fun valid arg -> valid && (isValidCoordinateArg arg gameSize.quadrantSize)) true
+         with
+            | false -> "Invalid long range move command - it takes the form: M x y w"
+            | true -> match (args |> Seq.skip(2) |> Seq.toArray).[0] |> isNumber
+                       with | false -> "Warp speed must be a number" | true -> ""
+    else
+        "Invalid move command"
         
 let private validateMoveQuadrantArgs (gameSize:WorldSize) args =
     match args |> Seq.length = 3 &&

@@ -143,7 +143,7 @@ let renderHelp () =
         Line("Q - quit the game") ;
         Line("S - short range scanner") ;
         Line("M x y - move within a sector (short range)") ;
-        Line("G x y - move within the galaxy (long range)")
+        Line("M x y w - move within the galaxy (long range) at the given warp speed")
         Line("E - show energy levels") ;
         Line("U - shields up") ;
         Line("D - shields down")

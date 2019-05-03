@@ -13,7 +13,6 @@ let private createCommand commandString args =
         | "M" -> match args |> Seq.length with
                     | 2 -> Command(PlayerAction.Action.MoveSector(Geography.createCoordinateWithStrings args))
                     | _ -> Command(PlayerAction.Action.MoveQuadrant(Geography.createCoordinateWithStrings args, int((args |> Seq.toArray).[2])))
-        | "G" -> Command(PlayerAction.Action.MoveQuadrant(Geography.createCoordinateWithStrings args, int((args |> Seq.toArray).[2])))
         | "S" -> Command(PlayerAction.Action.ShortRangeScanner)
         | "L" -> Command(PlayerAction.Action.LongRangeScanner)
         | "E" -> Command(PlayerAction.Action.EnergyLevels)
@@ -46,15 +45,6 @@ let private validateMoveArgs (gameSize:WorldSize) args =
     else
         "Invalid move command"
         
-let private validateMoveQuadrantArgs (gameSize:WorldSize) args =
-    match args |> Seq.length = 3 &&
-          args |> Seq.take(2) |> Seq.fold(fun valid arg -> valid && (isValidCoordinateArg arg gameSize.quadrantSize)) true
-     with
-        | false -> "Invalid long range move command - it takes the form: G x y w"
-        | true -> match (args |> Seq.skip(2) |> Seq.toArray).[0] |> isNumber
-                   with | false -> "Warp speed must be a number" | true -> ""
-                    
-
 let acceptInput gameSize =
         let readInput () =
             Rendering.renderWaitingForInput ()
@@ -68,7 +58,6 @@ let acceptInput gameSize =
         
         let errorMessage = match commandString with
                             | "M" -> validateMoveArgs gameSize args
-                            | "G" -> validateMoveQuadrantArgs gameSize args
                             | _ -> ""
                             
         match errorMessage with

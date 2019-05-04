@@ -21,7 +21,7 @@ let main _ =
     let newGame = createGame
     let gameSize = newGame.size
     Rendering.renderWelcomeMessage ()
-    Rendering.renderShortRangeScanner newGame 
+    Rendering.renderScanners newGame 
     
     let commands = seq {
         while true do

@@ -7,66 +7,42 @@ open PaddTrek.Game
 open ConsoleOutput
 open PaddTrek.Message
     
-let renderShortRangeScanner game =
-    let quadrant = Map.createCurrentQuadrant game
-    let consoleForegroundColor character =
-        match character with
-            | EnemyShip _ -> ForegroundColor(ConsoleColor.Red)
-            | Star _ -> ForegroundColor(ConsoleColor.DarkYellow)
-            | Player _ -> ForegroundColor(ConsoleColor.Blue)
-            | Starbase _ -> ForegroundColor(ConsoleColor.Blue)
-            | _ -> DefaultForegroundColor
-
-    let enemyShipCharacter enemyShip =
-        match enemyShip.enemyType with
-            | EnemyType.Scout -> String("s")
-            | EnemyType.Cruiser -> String("c")
-            | EnemyType.Dreadnought -> String("d")
-        
-    let getGameObjectCharacter gameWorldObject =
-        match gameWorldObject with
-            | GameWorldObject.EnemyShip enemy -> enemyShipCharacter enemy
-            | Star _ -> String("*")
-            | Player _ -> String("p")
-            | EmptySpace _ -> String(".")
-            | Starbase _ -> String("b")
-    
-    let processCell cell =
-        [
-            consoleForegroundColor cell ;
-            getGameObjectCharacter cell ;
-            String (" ")
-        ]
-    let processRow rowIndex =
-        [
-            HeaderColor ;
-            String(sprintf "%d" rowIndex) ;
-            DefaultColor ;
-            String(" ") ;
-            Seq(Seq.concat (Seq.map processCell quadrant.map.[rowIndex])) ;
-            DefaultColor ;
-            NewLine
-        ]
-    
-    let headerLine =
-        [
-            HeaderColor ;
-            String("  ") ;
-            String (((Seq.map (fun i -> sprintf "%d " i) [0..quadrant.map.[0].Length-1]) |> Seq.fold(+) "")) ;
-            DefaultColor ;
-            NewLine
-        ]
-    
-    Seq.map processRow [0..quadrant.map.[0].Length-1]
-        |> Seq.concat
-        |> Seq.append headerLine
-        |> write
-    
-let renderLongRangeScanner game =
-    let worldSize = game.size
+let renderScanners game =
+    let worldSize = game.size.quadrantSize
     let quadrantSummaries = createQuadrantSummaries game
+    let currentQuadrant = Map.createCurrentQuadrant game
+    
     let processRow rowIndex =
-        let outputCell colIndex =
+        let outputShortRangeCell cell =
+            let consoleForegroundColor character =
+                match character with
+                    | EnemyShip _ -> ForegroundColor(ConsoleColor.Red)
+                    | Star _ -> ForegroundColor(ConsoleColor.DarkYellow)
+                    | Player _ -> ForegroundColor(ConsoleColor.Blue)
+                    | Starbase _ -> ForegroundColor(ConsoleColor.Blue)
+                    | _ -> DefaultForegroundColor
+
+            let enemyShipCharacter enemyShip =
+                match enemyShip.enemyType with
+                    | EnemyType.Scout -> String("s")
+                    | EnemyType.Cruiser -> String("c")
+                    | EnemyType.Dreadnought -> String("d")
+                
+            let getGameObjectCharacter gameWorldObject =
+                match gameWorldObject with
+                    | GameWorldObject.EnemyShip enemy -> enemyShipCharacter enemy
+                    | Star _ -> String("*")
+                    | Player _ -> String("p")
+                    | EmptySpace _ -> String(".")
+                    | Starbase _ -> String("b")
+            
+            [
+                consoleForegroundColor cell ;
+                getGameObjectCharacter cell ;
+                String (" ")
+            ]
+        
+        let outputLongRangeCell colIndex =
             let cell = quadrantSummaries.[rowIndex].[colIndex]
             match cell.isDiscovered with
                 | true -> [
@@ -82,26 +58,45 @@ let renderLongRangeScanner game =
                     ForegroundColor(ConsoleColor.DarkGreen) ;
                     String(" ? ? ?  ")
                 ]
-        
+                
         [
-             HeaderColor ;
-             String(sprintf "%d" rowIndex) ;
-             DefaultColor ;
-             String(" ") ;
-             Seq(Seq.map outputCell [0..quadrantSummaries.[rowIndex].Length-1] |> Seq.concat) ;
-             DefaultColor ;
-             NewLine
+            // Short range
+            HeaderColor ;
+            String(sprintf "%d" rowIndex) ;
+            DefaultColor ;
+            String(" ") ;
+            Seq(Seq.concat (Seq.map outputShortRangeCell currentQuadrant.map.[rowIndex])) ;
+            String("    ") ;
+            // Long range
+            HeaderColor ;
+            String(sprintf "%d" rowIndex) ;
+            DefaultColor ;
+            String(" ") ;
+            Seq(Seq.map outputLongRangeCell [0..quadrantSummaries.[rowIndex].Length-1] |> Seq.concat) ;
+            DefaultColor ;
+            NewLine
         ]
-
+    
     let headerLine = [
+                         // short range
                          HeaderColor ;
                          String("  ") ;
-                         String(((Seq.map (fun i -> sprintf "   %d    " i) [0..worldSize.quadrantSize.width-1]) |> Seq.fold(+) "")) ;
+                         String (((Seq.map (fun i -> sprintf "%d " i) [0..currentQuadrant.map.[0].Length-1]) |> Seq.fold(+) "")) ;
+                         DefaultColor ;
+                         String("    ") ;
+                         // long range
+                         HeaderColor ;
+                         String("  ") ;
+                         String(((Seq.map (fun i -> sprintf "   %d    " i) [0..worldSize.width-1]) |> Seq.fold(+) "")) ;
                          DefaultColor ;
                          NewLine
                      ]    
+    
     let consoleOutput = (Seq.map processRow [0..quadrantSummaries.Length-1] |> Seq.concat) |> Seq.append [DefaultColor]
     consoleOutput |> Seq.append headerLine |> write
+    
+    
+
     
 let renderWelcomeMessage () =
     [
@@ -129,6 +124,27 @@ let renderEnergyLevels game =
         ("Port shields", player.shields.port)
     ] |> Seq.map renderRange |> Seq.concat |> write
     
+let renderShields game =
+    let player = game |> Game.getPlayer
+    let shields =
+        if player.shields.raised then
+            [
+                ForegroundColor(ConsoleColor.Green)
+                Line("Shields raised")
+            ]
+        else
+            [
+                ForegroundColor(ConsoleColor.Red)
+                Line("Shields lowered")
+            ]
+    [
+        ("Fore shields", player.shields.fore)
+        ("Starboard shields", player.shields.starboard)
+        ("Aft shields", player.shields.aft)
+        ("Port shields", player.shields.port)
+        ("Shield generator", player.health.ShieldGenerator.health)
+    ] |> Seq.map renderRange |> Seq.concat |> Seq.append shields |> write
+    
 let renderWaitingForInput () =
     [ NewLine ; String("> ") ] |> write
 
@@ -141,12 +157,12 @@ let renderMessage text =
 let renderHelp () =
     [
         Line("Q - quit the game") ;
-        Line("S - short range scanner") ;
+        Line("S - scanners") ;
         Line("M x y - move within a sector (short range)") ;
         Line("M x y w - move within the galaxy (long range) at the given warp speed")
         Line("E - show energy levels") ;
-        Line("U - shields up") ;
-        Line("D - shields down")
+        Line("R - raise shields") ;
+        Line("L - lower shields")
     ] |> write
 
 let renderError message =
@@ -158,10 +174,10 @@ let renderError message =
 
 let renderCommand game command =
     match command with
-    | PlayerAction.ShortRangeScanner | PlayerAction.MoveQuadrant(_,_) -> renderShortRangeScanner game
-    | PlayerAction.LongRangeScanner -> renderLongRangeScanner game
-    | PlayerAction.MoveSector coords -> renderShortRangeScanner game ; printf "Moved to position %d,%d" coords.x coords.y
+    | PlayerAction.ShortRangeScanner | PlayerAction.MoveQuadrant(_,_) -> renderScanners game
+    | PlayerAction.MoveSector coords -> renderScanners game ; printf "Moved to position %d,%d" coords.x coords.y
     | PlayerAction.EnergyLevels -> renderEnergyLevels game
+    | PlayerAction.RaiseShields | PlayerAction.LowerShields -> renderShields game
 
 let renderMessages messages =
     let createRenderOutputFromMessage message =

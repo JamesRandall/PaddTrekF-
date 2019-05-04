@@ -13,9 +13,11 @@ let private createCommand commandString args =
         | "M" -> match args |> Seq.length with
                     | 2 -> Command(PlayerAction.Action.MoveSector(Geography.createCoordinateWithStrings args))
                     | _ -> Command(PlayerAction.Action.MoveQuadrant(Geography.createCoordinateWithStrings args, int((args |> Seq.toArray).[2])))
-        | "S" -> Command(PlayerAction.Action.ShortRangeScanner)
-        | "L" -> Command(PlayerAction.Action.LongRangeScanner)
+        | "S" -> Command(PlayerAction.Action.ShortRangeScanner) // combine with long range output
+        //| "L" -> Command(PlayerAction.Action.LongRangeScanner)
         | "E" -> Command(PlayerAction.Action.EnergyLevels)
+        | "R" -> Command(PlayerAction.Action.RaiseShields)
+        | "L" -> Command(PlayerAction.Action.LowerShields)
         | "Q" -> ConsoleCommand.Quit
         | "?" -> ConsoleCommand.Help
         | "X" -> ConsoleCommand.Clear

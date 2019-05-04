@@ -175,8 +175,11 @@ let quadrantsAroundPlayer (worldSize:Geography.WorldSize) player = seq {
                 yield coord
     }
 
-let raiseShields player =
-    match player.shields.raised with
-        | true -> ({ player with  shields = { player.shields with raised = true } }, true)
+let private setShields raise player =
+    match not (player.shields.raised = raise) with
+        | true -> ({ player with  shields = { player.shields with raised = raise } }, true)
         | false -> (player, false)
-    
+
+let raiseShields player = player |> setShields true    
+        
+let lowerShields player = player |> setShields false

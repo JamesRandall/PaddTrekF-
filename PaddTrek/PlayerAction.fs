@@ -6,9 +6,9 @@ type Action =
     | MoveSector of Geography.Coordinate
     | MoveQuadrant of Geography.Coordinate * int
     | ShortRangeScanner
-    | LongRangeScanner
     | EnergyLevels
     | RaiseShields
+    | LowerShields
     
 type ActionValidation = {
     isValid: bool
@@ -53,9 +53,18 @@ let execute game action =
         { game with Game.objects = game.objects |> Seq.map (function | Game.Player _ -> Game.Player(newPlayer) | other -> other) |> Seq.toList }
     let player = Game.getPlayer game
     
+    let raiseShields () =
+        let updatedPlayer, didRaiseShields = Player.raiseShields player
+        (replacePlayer updatedPlayer), didRaiseShields
+        
+    let lowerShields () =
+        let updatedPlayer, didLowerShields = Player.lowerShields player
+        (replacePlayer updatedPlayer), didLowerShields
+    
     match action with
         | MoveSector coords -> (replacePlayer (Player.moveToSector player coords), true)
         | MoveQuadrant (coords,warpSpeed) -> ((replacePlayer (Player.moveToQuadrant player coords warpSpeed)
                                               |> Game.updateDiscoveredQuadrants), true)
-        | RaiseShields -> 
+        | RaiseShields -> raiseShields ()
+        | LowerShields -> lowerShields ()
         | _ -> (game, false)

@@ -101,12 +101,16 @@ let moveToQuadrant player coordinates warpSpeed =
 let hitByEnergyWeapon energy fromCoordinates player =
     let playerPosition = player.attributes.position.sector
     let angleOfHit = Geography.angleBetweenTwoPoints playerPosition fromCoordinates
+    let shieldsUp = player.shields.raised
+    
+    let shieldAbsorption = (if shieldsUp then 1.0 else 0.0) * Range.effectivenessMultiplier player.health.ShieldGenerator.health
+    let shieldAbsorbableEnergy = int(shieldAbsorption * float(energy))
     
     // if you're dense like me then starboard is on the right when looking towards the front, port on the left
-    let foreEnergyHit () = if angleOfHit <= 45.0 || angleOfHit >=315.0 then energy else 0    
-    let starboardEnergyHit () = if angleOfHit > 45.0 && angleOfHit < 135.0 then energy else 0
-    let aftEnergyHit () = if angleOfHit >=135.0 && angleOfHit <= 225.0 then energy else 0
-    let portEnergyHit () = if angleOfHit > 225.0 && angleOfHit < 315.0 then energy else 0
+    let foreEnergyHit () = if (angleOfHit <= 45.0 || angleOfHit >=315.0) then shieldAbsorbableEnergy else 0    
+    let starboardEnergyHit () = if angleOfHit > 45.0 && angleOfHit < 135.0 then shieldAbsorbableEnergy else 0
+    let aftEnergyHit () = if angleOfHit >=135.0 && angleOfHit <= 225.0 then shieldAbsorbableEnergy else 0
+    let portEnergyHit () = if angleOfHit > 225.0 && angleOfHit < 315.0 then shieldAbsorbableEnergy else 0
      
     let newForeShield, actualForeShieldAdjustment = player.shields.fore |> Range.decrement (foreEnergyHit ()) 
     let newPortShield, actualPortShieldAdjustment = player.shields.port |> Range.decrement (portEnergyHit ())
@@ -170,3 +174,9 @@ let quadrantsAroundPlayer (worldSize:Geography.WorldSize) player = seq {
                 let coord:Geography.Coordinate = { x = x ; y = y }
                 yield coord
     }
+
+let raiseShields player =
+    match player.shields.raised with
+        | true -> ({ player with  shields = { player.shields with raised = true } }, true)
+        | false -> (player, false)
+    

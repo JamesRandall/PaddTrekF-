@@ -8,6 +8,7 @@ type Action =
     | ShortRangeScanner
     | LongRangeScanner
     | EnergyLevels
+    | RaiseShields
     
 type ActionValidation = {
     isValid: bool
@@ -44,7 +45,7 @@ let validate game action =
     
     match action with
         | MoveSector coords -> coords |> validateMoveSector
-        | MoveQuadrant (moveQuadrant,warpSpeed) -> validateMoveQuadrant (moveQuadrant,warpSpeed) 
+        | MoveQuadrant (moveQuadrant,warpSpeed) -> validateMoveQuadrant (moveQuadrant,warpSpeed)
         | _ -> success
 
 let execute game action =
@@ -56,4 +57,5 @@ let execute game action =
         | MoveSector coords -> (replacePlayer (Player.moveToSector player coords), true)
         | MoveQuadrant (coords,warpSpeed) -> ((replacePlayer (Player.moveToQuadrant player coords warpSpeed)
                                               |> Game.updateDiscoveredQuadrants), true)
+        | RaiseShields -> 
         | _ -> (game, false)

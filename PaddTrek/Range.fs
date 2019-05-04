@@ -34,4 +34,12 @@ let decrement byAmount range =
     
 let percentage range =
     100 * range.value / range.max
+
+// 100% effectiveness returns 1, 0% returns 0 for use in a multiplier
+let effectivenessMultiplier range =
+    let efficiency = range |> percentage
+    // TODO - solve the equation to resolve the right multiplier
+    let result = 2.0 ** (float(efficiency) * 0.0666666666)
+    // we just cap this to the range 0.0 to 1.0
+    max (min result 1.0) 0.0 
     
